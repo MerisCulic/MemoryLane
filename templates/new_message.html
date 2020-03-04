@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}New message{% endblock title %}
+{% block content %}
+<form method="post" action="/new_message">
+    <input type="text" name="title" placeholder="Enter email title"><br>
+    <input type="email" name="reciever" placeholder="Enter the reciever's email"><br>
+    <textarea name="message" rows="10" cols="30" placeholder="Enter your message"></textarea><br>
+
+    <button>Send</button>
+</form>
+{% endblock content %}

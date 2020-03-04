@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, make_respo
 import uuid
 import hashlib
 from models import User, db
+import json
 
 
 app = Flask(__name__)
@@ -67,6 +68,35 @@ def profile():
         return render_template("profile.html", user=user)
     else:
         return render_template('index.html')
+
+@app.route("/new_message", methods=["GET", "POST"])
+def new_message():
+    if request.method == "GET":
+            return render_template("new_message.html")
+
+    if request.method == "POST":
+        session_token = request.cookies.get("session_token")
+
+        if session_token:
+            user = db.query(User).filter_by(session_token=session_token).first()
+        else:
+            return render_template('index.html')
+
+        reciever = request.form.get("reciever")
+        title = request.form.get("reciever")
+        message = request.form.get("message")
+        sender = {{ user.email }}
+
+        message.sender = sender
+        message.reciever = reciever
+        message.title = title
+        message.message = message
+
+        db.add(message)
+        db.commit()
+
+        #return redirect(url_for('profile'))
+
 
 
 
