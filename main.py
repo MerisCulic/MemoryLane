@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, make_respo
 import uuid
 import hashlib
 from models import User, Sent_messages, db
-import json
+import smtplib
+
 
 
 app = Flask(__name__)
@@ -64,7 +65,7 @@ def login():
             return response
 
 
-@app.route('/profile", methods=["GET"]')
+@app.route('/profile', methods=["GET"])
 def profile():
     session_token = request.cookies.get("session_token")
 
