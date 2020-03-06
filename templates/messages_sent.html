@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Sent messages{% endblock title %}
+{% block content %}
+<h1>{{ message }}</h1>
+<ul>
+{% for sent in sent_messages %}
+    <li><a href="/sent/{{ sent.id }}">{{ sent.title }}</a></li>
+{% endfor %}
+</ul>
+{% endblock content %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ sent.title }}{% endblock title %}
+
+{% block content %}
+<h2>Title: {{ sent.title }}</h2>
+<p>To: {{ sent.reciever }}</p>
+
+<p>{{ sent.message_text }}</p>
+
+{% endblock content %}

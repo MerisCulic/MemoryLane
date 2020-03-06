@@ -11,9 +11,15 @@ class User(db.Model):
     session_token = db.Column(db.String)
 
 
-class Message(db.Model):
+class Sent_messages(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender = db.Column(db.String)
     reciever = db.Column(db.String)
     title = db.Column(db.String)
-    message = db.Column(db.String)
+    message_text = db.Column(db.String)
+
+class Recieved_messages(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender = db.Column(db.String)
+    title = db.Column(db.String)
+    message_text = db.Column(db.String)
