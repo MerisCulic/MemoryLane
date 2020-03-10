@@ -1,19 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, make_response
 import uuid
 import hashlib
-from models import User, Sent_messages, db
-import smtplib
-
+from models import User, Messages, db
+from datetime import datetime
 
 
 app = Flask(__name__)
 db.create_all()
-
-def find_user():
-    session_token = request.cookies.get("session_token")
-    user = db.query(User).filter_by(session_token=session_token).first()
-
-    return user
 
 
 @app.route("/")
@@ -25,7 +18,6 @@ def index():
         return render_template('profile.html', user=user)
     else:
         return render_template('index.html')
-
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -75,6 +67,7 @@ def profile():
     else:
         return render_template('index.html')
 
+
 @app.route("/new_message", methods=["GET", "POST"])
 def new_message():
     session_token = request.cookies.get("session_token")
@@ -93,19 +86,21 @@ def new_message():
         message_text = request.form.get("message_text")
         sender = user.email
 
-        message = Sent_messages(reciever=reciever, sender=sender, title=title, message_text=message_text)
+        message = Messages(reciever=reciever, sender=sender, title=title, message_text=message_text, date_posted=datetime.now())
 
-        db.add(message)
-        db.commit()
+        db.session.add(message)
+        db.session.commit()
 
         return redirect(url_for('profile'))
+
 
 @app.route('/sent', methods=["GET"])
 def sent_messages():
     session_token = request.cookies.get("session_token")
     user = db.query(User).filter_by(session_token=session_token).first()
-    sent_messages = db.query(Sent_messages).all()
+    sender = user.email
 
+    sent_messages = db.query(Messages).filter_by(sender=sender).order_by(Messages.date_posted.desc()).all()
 
     if not sent_messages:
         message = "You have no sent messages!"
@@ -114,14 +109,29 @@ def sent_messages():
 
     return render_template('messages_sent.html', sent_messages=sent_messages, user=user, message=message)
 
-@app.route("/sent/<sent_id>", methods=["GET"])
-def messsage_details(sent_id):
 
-    sent = db.query(Sent_messages).get(int(sent_id))
+@app.route("/sent/<sent_id>", methods=["GET"])
+def message_details(sent_id):
+
+    sent = db.query(Messages).get(int(sent_id))
 
     return render_template('message_details.html', sent=sent)
 
 
+@app.route("/sent/<sent_id>/message_delete", methods=["GET", "POST"])
+def message_delete(sent_id):
+    session_token = request.cookies.get("session_token")
+    user = db.query(User).filter_by(session_token=session_token).first()
+    sent = db.query(Messages).filter_by(id=sent_id)
+
+    if request.method == "GET":
+        if user:
+            return render_template('message_delete.html', sent=sent)
+    if request.method == "POST":
+        db.delete(sent)
+        db.commit()
+
+        return redirect(url_for('index'))
 
 
 if __name__ == '__main__':

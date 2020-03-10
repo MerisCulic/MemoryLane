@@ -1,7 +1,8 @@
 from sqla_wrapper import SQLAlchemy
 import os
+import datetime
 
-db = SQLAlchemy(os.getenv("DATABASE_URL", "sqlite:///localhost.sqlite"))
+db = SQLAlchemy(os.getenv("DATABASE_URL", "sqlite:///localhost.sqlite")) #TODO: Change localhost to heroku
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -11,15 +12,11 @@ class User(db.Model):
     session_token = db.Column(db.String)
 
 
-class Sent_messages(db.Model):
+class Messages(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender = db.Column(db.String)
     reciever = db.Column(db.String)
     title = db.Column(db.String)
-    message_text = db.Column(db.String)
+    date_posted = db.Column(db.DateTime)
+    message_text = db.Column(db.Text)
 
-class Recieved_messages(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    sender = db.Column(db.String)
-    title = db.Column(db.String)
-    message_text = db.Column(db.String)

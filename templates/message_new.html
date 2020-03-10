@@ -2,8 +2,8 @@
 {% block title %}New message{% endblock title %}
 {% block content %}
 <form method="post" action="/new_message">
-    <input type="text" name="title" placeholder="Enter email title"><br>
-    <input type="email" name="reciever" placeholder="Enter the reciever's email"><br>
+    <input type="text" name="title" placeholder="Subject"><br>
+    <input type="email" name="reciever" placeholder="To"><br>
     <textarea name="message_text" rows="10" cols="30" placeholder="Enter your message"></textarea><br>
 
     <button>Send</button>
