@@ -1,6 +1,6 @@
 from sqla_wrapper import SQLAlchemy
 import os
-import datetime
+
 
 db = SQLAlchemy(os.getenv("DATABASE_URL", "sqlite:///localhost.sqlite")) #TODO: Change localhost to heroku
 

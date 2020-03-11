@@ -115,23 +115,23 @@ def message_details(sent_id):
 
     sent = db.query(Messages).get(int(sent_id))
 
-    return render_template('message_details.html', sent=sent)
+    return render_template('message_details.html', sent=sent, sent_id=sent_id)
 
 
-@app.route("/sent/<sent_id>/message_delete", methods=["GET", "POST"])
+@app.route("/sent/<int:sent_id>/delete", methods=['POST'])
 def message_delete(sent_id):
     session_token = request.cookies.get("session_token")
-    user = db.query(User).filter_by(session_token=session_token).first()
-    sent = db.query(Messages).filter_by(id=sent_id)
+    if session_token:
 
-    if request.method == "GET":
-        if user:
-            return render_template('message_delete.html', sent=sent)
-    if request.method == "POST":
-        db.delete(sent)
-        db.commit()
+        sent = db.query(Messages).get(sent_id)
+        db.session.delete(sent)
+        db.session.commit()
 
+        #flash('Message was deleted!', 'success')
         return redirect(url_for('index'))
+
+    else:
+        return "WTF man?!"
 
 
 if __name__ == '__main__':
