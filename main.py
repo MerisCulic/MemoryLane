@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, make_response
+from flask import Flask, render_template, request, redirect, url_for, make_response, flash
 import uuid
 import hashlib
 from models import User, Messages, db
@@ -7,6 +7,8 @@ from datetime import datetime
 
 app = Flask(__name__)
 db.create_all()
+app.secret_key = b'\xbf,\x92\xda\x11\x844\xae\xf4i\xd36\x01\xef\xa4\xde\x8f\xc4\xbb\x0b\x99(\xad\xb4'
+
 
 
 @app.route("/")
@@ -124,14 +126,14 @@ def message_delete(sent_id):
     if session_token:
 
         sent = db.query(Messages).get(sent_id)
-        db.session.delete(sent)
-        db.session.commit()
+        db.delete(sent)
+        db.commit()
 
-        #flash('Message was deleted!', 'success')
+        flash("Message was deleted!", "success")
         return redirect(url_for('index'))
 
     else:
-        return "WTF man?!"
+        return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
