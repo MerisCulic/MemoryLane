@@ -112,21 +112,39 @@ def sent_messages():
     return render_template('messages_sent.html', sent_messages=sent_messages, user=user, message=message)
 
 
-@app.route("/sent/<sent_id>", methods=["GET"])
-def message_details(sent_id):
+@app.route('/inbox', methods=["GET"])
+def recieved_messages():
+    session_token = request.cookies.get("session_token")
+    user = db.query(User).filter_by(session_token=session_token).first()
+    reciever = user.email
 
-    sent = db.query(Messages).get(int(sent_id))
+    recieved_messages = db.query(Messages).filter_by(reciever=reciever).order_by(Messages.date_posted.desc()).all()
 
-    return render_template('message_details.html', sent=sent, sent_id=sent_id)
+    if not recieved_messages:
+        message = "Your inbox is empty!"
+    else:
+        message = "Inbox"
+
+    return render_template('messages_recieved.html', recieved_messages=recieved_messages, user=user, message=message)
 
 
-@app.route("/sent/<int:sent_id>/delete", methods=['POST'])
-def message_delete(sent_id):
+@app.route("/sent/<msg_id>", methods=["GET"])
+@app.route("/inbox/<msg_id>", methods=["GET"])
+def message_details(msg_id):
+
+    msg = db.query(Messages).get(int(msg_id))
+
+    return render_template('message_details.html', msg=msg, msg_id=msg_id)
+
+
+@app.route("/sent/<int:msg_id>/delete", methods=['POST'])
+@app.route("/inbox/<int:msg_id>/delete", methods=['POST'])
+def message_delete(msg_id):
     session_token = request.cookies.get("session_token")
     if session_token:
 
-        sent = db.query(Messages).get(sent_id)
-        db.delete(sent)
+        msg = db.query(Messages).get(msg_id)
+        db.delete(msg)
         db.commit()
 
         flash("Message was deleted!", "success")
@@ -134,6 +152,13 @@ def message_delete(sent_id):
 
     else:
         return redirect(url_for('index'))
+
+
+@app.route('/users')
+def users():
+
+    users = db.query(User).all()
+    return render_template('users.html', users=users)
 
 
 if __name__ == '__main__':

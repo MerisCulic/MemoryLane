@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Registered users{% endblock title %}
+{% block content %}
+<h3>List of Das Mail users:</h3>
+<hr>
+{% for user in users %}
+<ul>
+     <li><a href="/user/{{ user.id }}">{{ user.name }}</a></li>
+    <hr>
+</ul>
+{% endfor %}
+{% endblock %}

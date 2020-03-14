@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ sent.title }}{% endblock title %}
+{% block title %}{{ msg.title }}{% endblock title %}
 
 {% block content %}
-<h3>Title: {{ sent.title }}</h3>
-<p>To: {{ sent.reciever }}</p>
+<h3>Title: {{ msg.title }}</h3>
+<p>To: {{ msg.reciever }}</p>
 <hr>
-<p>{{ sent.message_text }}</p>
+<p>{{ msg.message_text }}</p>
 <hr>
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
@@ -23,7 +23,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <form action="{{ url_for('message_delete', sent_id=sent.id) }}" method="POST">
+        <form action="{{ url_for('message_delete', msg_id=msg.id) }}" method="POST">
             <input class="btn btn-danger" type="submit" value="Delete">
         </form>
       </div>

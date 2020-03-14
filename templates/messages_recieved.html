@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Inbox{% endblock title %}
+{% block content %}
+<h1>{{ message }}</h1>
+<ul>
+{% for msg in recieved_messages %}
+    <li><a href="/inbox/{{ msg.id }}">{{ msg.title }}</a></li>
+{% endfor %}
+</ul>
+{% endblock content %}
