@@ -75,6 +75,7 @@ def new_message():
     session_token = request.cookies.get("session_token")
     user = db.query(User).filter_by(session_token=session_token).first()
 
+
     if request.method == "GET":
         if user:
             return render_template("message_new.html")
@@ -93,6 +94,7 @@ def new_message():
         db.session.add(message)
         db.session.commit()
 
+        flash('Your message was sent!', 'info')
         return redirect(url_for('profile'))
 
 
@@ -128,17 +130,17 @@ def recieved_messages():
     return render_template('messages_recieved.html', recieved_messages=recieved_messages, user=user, message=message)
 
 
-@app.route("/sent/<msg_id>", methods=["GET"])
-@app.route("/inbox/<msg_id>", methods=["GET"])
-def message_details(msg_id):
+
+@app.route("/<string:status>/<msg_id>", methods=["GET"])
+def message_details(status, msg_id):
 
     msg = db.query(Messages).get(int(msg_id))
 
-    return render_template('message_details.html', msg=msg, msg_id=msg_id)
+    return render_template('message_details.html', msg=msg, msg_id=msg_id, status=status)
 
 
-@app.route("/sent/<int:msg_id>/delete", methods=['POST'])
-@app.route("/inbox/<int:msg_id>/delete", methods=['POST'])
+
+@app.route("/<int:msg_id>/delete", methods=['POST'])
 def message_delete(msg_id):
     session_token = request.cookies.get("session_token")
     if session_token:
@@ -159,6 +161,14 @@ def users():
 
     users = db.query(User).all()
     return render_template('users.html', users=users)
+
+
+@app.route("/users/<user_id>", methods=["GET"])
+def user_details(user_id):
+
+    user = db.query(User).get(int(user_id))
+
+    return render_template("user_details.html", user=user)
 
 
 if __name__ == '__main__':

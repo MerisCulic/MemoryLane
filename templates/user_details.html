@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}User details{% endblock title %}
+
+{% block content %}
+<h3>{{ user.name }}</h3>
+
+<p><strong>Email:</strong> {{ user.email }}</p>
+
+
+<a class="btn btn-primary btn-sm" href="{{ url_for('new_message')}}" role="button">Send message to {{ user.name }}</a>
+{% endblock content %}

@@ -3,8 +3,16 @@
 {% block title %}{{ msg.title }}{% endblock title %}
 
 {% block content %}
-<h3>Title: {{ msg.title }}</h3>
+<h3>{{ msg.title }}</h3>
+
+{% if status == 'sent' %}
 <p>To: {{ msg.reciever }}</p>
+{% endif %}
+
+{% if status == 'inbox' %}
+<p>From: {{ msg.sender }}</p>
+{% endif %}
+
 <hr>
 <p>{{ msg.message_text }}</p>
 <hr>

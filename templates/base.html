@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     {% endblock styles %}
 
-    <title>Message app {% block title %}{% endblock title %}</title>
+    <title>{% block title %}{% endblock title %}</title>
     {% endblock head %}
   </head>
   <body>
@@ -25,6 +25,7 @@
         <div class="navbar-nav">
           <a class="nav-item nav-link active" href="/profile">Home <span class="sr-only">(current)</span></a>
           <a class="nav-item nav-link active" href="/new_message">New message</a>
+          <a class="nav-item nav-link active" href="/inbox">Inbox</a>
           <a class="nav-item nav-link active" href="/sent">Sent</a>
           <a class="nav-item nav-link active" href="/users">Users</a>
         </div>
