@@ -22,13 +22,52 @@ def index():
         return render_template('index.html')
 
 
+@app.route("/register", methods=["GET", "POST"])
+def registration():
+    if request.method == "GET":
+            return render_template("registration.html")
+
+    if request.method == "POST":
+        name = request.form.get("user-name")
+        email = request.form.get("user-email")
+        password = request.form.get("user-password")
+        confirm_password = request.form.get("confirm-user-password")
+
+        if not len(password) >= 5:
+            flash("Password length must be at least 5 characters", "warning")
+            return redirect(request.url)
+
+        if confirm_password != password:
+            flash("Your passwords don't match!", "warning")
+            return redirect(request.url)
+
+        else:
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
+            user = User(name=name, email=email, password=hashed_password)
+
+            db.add(user)
+            db.commit()
+
+            session_token = str(uuid.uuid4())
+
+            user.session_token = session_token
+            db.add(user)
+            db.commit()
+
+            response = make_response(redirect(url_for('profile', user=user)))
+            response.set_cookie("session_token", session_token, httponly=True, samesite='Strict')
+            flash('Account successfully created!', 'success')
+
+            return response
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
             return render_template("login_page.html")
 
     if request.method == "POST":
-        name = request.form.get("user-name")
         email = request.form.get("user-email")
         password = request.form.get("user-password")
 
@@ -37,13 +76,12 @@ def login():
         user = db.query(User).filter_by(email=email).first()
 
         if not user:
-            user = User(name=name, email=email, password=hashed_password)
-
-            db.add(user)
-            db.commit()
+            flash("Sorry, you weren't found in the database. Please register!", "warning")
+            return redirect(url_for('registration'))
 
         if hashed_password != user.password:
-            return "WRONG PASSWORD! Please go back and try again!"
+            flash("WRONG PASSWORD! Please try again!", "warning")
+            return redirect(request.url)
 
 
         elif hashed_password == user.password:
@@ -55,6 +93,7 @@ def login():
 
             response = make_response(redirect(url_for('profile', user=user)))
             response.set_cookie("session_token", session_token, httponly=True, samesite='Strict')
+            flash('You were successfully logged in', 'success')
 
             return response
 
