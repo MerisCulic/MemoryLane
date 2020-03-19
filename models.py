@@ -20,3 +20,11 @@ class Messages(db.Model):
     date_posted = db.Column(db.DateTime)
     message_text = db.Column(db.Text)
 
+
+class Posts(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(50))
+    author = db.Column(db.String(30))
+    date_posted = db.Column(db.DateTime)
+    content = db.Column(db.Text)
+

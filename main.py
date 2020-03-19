@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, make_response, flash
 import uuid
 import hashlib
-from models import User, Messages, db
+from models import User, Messages, db, Posts
 from datetime import datetime
 
 
@@ -46,12 +46,9 @@ def registration():
 
             user = User(name=name, email=email, password=hashed_password)
 
-            db.add(user)
-            db.commit()
-
             session_token = str(uuid.uuid4())
-
             user.session_token = session_token
+
             db.add(user)
             db.commit()
 
@@ -80,7 +77,7 @@ def login():
             return redirect(url_for('registration'))
 
         if hashed_password != user.password:
-            flash("WRONG PASSWORD! Please try again!", "warning")
+            flash("Wrong password! Please try again!", "warning")
             return redirect(request.url)
 
 
@@ -130,8 +127,8 @@ def new_message():
 
         message = Messages(reciever=reciever, sender=sender, title=title, message_text=message_text, date_posted=datetime.now())
 
-        db.session.add(message)
-        db.session.commit()
+        db.add(message)
+        db.commit()
 
         flash('Your message was sent!', 'info')
         return redirect(url_for('profile'))
@@ -208,6 +205,53 @@ def user_details(user_id):
     user = db.query(User).get(int(user_id))
 
     return render_template("user_details.html", user=user)
+
+
+@app.route('/addpost', methods=["GET", "POST"])
+def addpost():
+    session_token = request.cookies.get("session_token")
+    user = db.query(User).filter_by(session_token=session_token).first()
+
+    if request.method == "GET":
+        if user:
+            return render_template('add_post.html')
+        else:
+            return render_template('index.html')
+
+
+    if request.method == "POST":
+
+        title = request.form.get("title")
+        content = request.form.get("content")
+        author = user.name
+
+        post = Posts(title=title, author=author, content=content, date_posted=datetime.now())
+
+        db.add(post)
+        db.commit()
+
+        flash('Post added!', 'info')
+        return redirect(url_for('home'))
+
+
+@app.route('/home', methods=['GET'])
+def home():
+    session_token = request.cookies.get("session_token")
+    user = db.query(User).filter_by(session_token=session_token).first()
+
+    if user:
+        posts = db.query(Posts).order_by(Posts.date_posted.desc()).all()
+        return render_template('home.html', posts=posts)
+
+
+
+@app.route('/post/<int:post_id>')
+def post(post_id):
+    post = db.query(Posts).get(int(post_id))
+
+    date_posted = post.date_posted.strftime('%B %d, %Y')
+
+    return render_template('post.html', post=post, date_posted=date_posted)
 
 
 if __name__ == '__main__':
