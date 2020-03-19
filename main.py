@@ -247,11 +247,32 @@ def home():
 
 @app.route('/post/<int:post_id>')
 def post(post_id):
+    session_token = request.cookies.get("session_token")
+    user = db.query(User).filter_by(session_token=session_token).first()
+
     post = db.query(Posts).get(int(post_id))
 
     date_posted = post.date_posted.strftime('%B %d, %Y')
 
-    return render_template('post.html', post=post, date_posted=date_posted)
+    return render_template('post.html', post=post, user=user, date_posted=date_posted)
+
+@app.route('/postdelete/<int:post_id>', methods = ['POST'])
+def post_delete(post_id):
+    session_token = request.cookies.get("session_token")
+    user = db.query(User).filter_by(session_token=session_token).first()
+    
+    post = db.query(Posts).get(post_id)
+
+    if post.author == user.name:
+        db.delete(post)
+        db.commit()
+
+        flash("Your post was deleted!", "success")
+        return redirect(url_for('index'))
+
+    else:
+        flash("You can't delete other people's posts!", "warning")
+        return redirect(url_for('index'))
 
 
 if __name__ == '__main__':

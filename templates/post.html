@@ -13,6 +13,30 @@
           <span class="meta">Posted by
             {{ post.author }}
             on {{ post.date_posted.strftime('%B %d, %Y') }}</span>
+          {% if user.name == post.author %}
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+
+          <!-- Modal -->
+          <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="deleteModalLabel">Delete post?</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <form action="{{ url_for('post_delete', post_id=post.id, user=user) }}" method="POST">
+                      <input class="btn btn-danger" type="submit" value="Delete">
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -29,4 +53,6 @@
     </div>
   </div>
 </article>
+
+
 {% endblock content %}
