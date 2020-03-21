@@ -10,7 +10,6 @@ db.create_all()
 app.secret_key = b'\xbf,\x92\xda\x11\x844\xae\xf4i\xd36\x01\xef\xa4\xde\x8f\xc4\xbb\x0b\x99(\xad\xb4'
 
 
-
 @app.route("/")
 def index():
     session_token = request.cookies.get("session_token")
@@ -25,7 +24,7 @@ def index():
 @app.route("/register", methods=["GET", "POST"])
 def registration():
     if request.method == "GET":
-            return render_template("registration.html")
+        return render_template("registration.html")
 
     if request.method == "POST":
         name = request.form.get("user-name")
@@ -62,7 +61,7 @@ def registration():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-            return render_template("login_page.html")
+        return render_template("login_page.html")
 
     if request.method == "POST":
         email = request.form.get("user-email")
@@ -80,7 +79,6 @@ def login():
             flash("Wrong password! Please try again!", "warning")
             return redirect(request.url)
 
-
         elif hashed_password == user.password:
             session_token = str(uuid.uuid4())
 
@@ -93,6 +91,15 @@ def login():
             flash('You were successfully logged in', 'success')
 
             return response
+
+
+@app.route('/logout', methods=["GET"])
+def logout():
+
+    response = make_response(redirect(url_for('index')))
+    response.set_cookie("session_token", expires=0)
+    flash('You were successfully logged out!', 'success')
+    return response
 
 
 @app.route('/profile', methods=["GET"])
@@ -111,7 +118,6 @@ def new_message():
     session_token = request.cookies.get("session_token")
     user = db.query(User).filter_by(session_token=session_token).first()
 
-
     if request.method == "GET":
         if user:
             return render_template("message_new.html")
@@ -125,7 +131,8 @@ def new_message():
         message_text = request.form.get("message_text")
         sender = user.email
 
-        message = Messages(reciever=reciever, sender=sender, title=title, message_text=message_text, date_posted=datetime.now())
+        message = Messages(reciever=reciever, sender=sender, title=title,
+                           message_text=message_text, date_posted=datetime.now())
 
         db.add(message)
         db.commit()
@@ -166,14 +173,12 @@ def recieved_messages():
     return render_template('messages_recieved.html', recieved_messages=recieved_messages, user=user, message=message)
 
 
-
 @app.route("/<string:status>/<msg_id>", methods=["GET"])
 def message_details(status, msg_id):
 
     msg = db.query(Messages).get(int(msg_id))
 
     return render_template('message_details.html', msg=msg, msg_id=msg_id, status=status)
-
 
 
 @app.route("/<int:msg_id>/delete", methods=['POST'])
@@ -194,14 +199,12 @@ def message_delete(msg_id):
 
 @app.route('/users')
 def users():
-
     users = db.query(User).all()
     return render_template('users.html', users=users)
 
 
 @app.route("/users/<user_id>", methods=["GET"])
 def user_details(user_id):
-
     user = db.query(User).get(int(user_id))
 
     return render_template("user_details.html", user=user)
@@ -217,7 +220,6 @@ def addpost():
             return render_template('add_post.html')
         else:
             return render_template('index.html')
-
 
     if request.method == "POST":
 
@@ -236,13 +238,9 @@ def addpost():
 
 @app.route('/home', methods=['GET'])
 def home():
-    session_token = request.cookies.get("session_token")
-    user = db.query(User).filter_by(session_token=session_token).first()
+    posts = db.query(Posts).order_by(Posts.date_posted.desc()).all()
 
-    if user:
-        posts = db.query(Posts).order_by(Posts.date_posted.desc()).all()
-        return render_template('home.html', posts=posts)
-
+    return render_template('home.html', posts=posts)
 
 
 @app.route('/post/<int:post_id>')
@@ -256,11 +254,12 @@ def post(post_id):
 
     return render_template('post.html', post=post, user=user, date_posted=date_posted)
 
-@app.route('/postdelete/<int:post_id>', methods = ['POST'])
+
+@app.route('/postdelete/<int:post_id>', methods=['POST'])
 def post_delete(post_id):
     session_token = request.cookies.get("session_token")
     user = db.query(User).filter_by(session_token=session_token).first()
-    
+
     post = db.query(Posts).get(post_id)
 
     if post.author == user.name:
@@ -271,7 +270,6 @@ def post_delete(post_id):
         return redirect(url_for('index'))
 
     else:
-        flash("You can't delete other people's posts!", "warning")
         return redirect(url_for('index'))
 
 
