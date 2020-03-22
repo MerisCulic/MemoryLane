@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 
+{% block styles %}
+<link rel="stylesheet" href="static/css/home.css">
+{% endblock styles %}
+
 {% block title %}Home{% endblock title %}
+
+
 {% block content %}
 
 {% for post in posts %}
@@ -12,4 +18,5 @@
 </article><br>
 <p><i>Posted by {{ post.author }} on {{ post.date_posted.strftime('%B %d, %Y') }}</i></p><hr>
 {% endfor %}
+
 {% endblock content %}
