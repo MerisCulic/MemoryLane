@@ -3,7 +3,7 @@
 {% block title %}New post{% endblock title %}
 {% block content %}
 
-<div class="container">
+<div class="container content white shadow">
   <div class="row">
     <div class="col-lg-8 col-md-10 mx-auto">
       <form name="addForm" id="addForm" method="POST" action="{{ url_for('addpost') }}" novalidate>
@@ -24,7 +24,7 @@
         <br>
         <div id="success"></div>
         <div class="form-group">
-          <button type="submit" class="btn btn-secondary" id="sendMessageButton">Send</button>
+          <button type="submit" class="btn btn-secondary" id="sendMessageButton">Submit</button>
         </div>
       </form>
     </div>

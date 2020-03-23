@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{% endblock title %}
+
+
+{% block content %}
+ <div class="container content">
+  <div class="row">
+    <div class="col-2 sidemenu">
+        <a href="/new_message">New message</a><br>
+        <a href="/inbox">Inbox</a><br>
+        <a href="/sent">Sent</a><br>
+    </div>
+    <div class="col white messages">
+        {% block messages %}
+        {% endblock messages %}
+    </div>
+  </div>
+
+{% endblock content %}

@@ -3,6 +3,7 @@
 {% block title %}{{ msg.title }}{% endblock title %}
 
 {% block content %}
+<div class="container content white shadow"><br>
 <h3>{{ msg.title }}</h3>
 
 {% if status == 'sent' %}
@@ -10,7 +11,7 @@
 {% endif %}
 
 {% if status == 'inbox' %}
-<p>From: {{ msg.sender }}</p>
+<p>From: {{ msg.sender_name }}</p>
 {% endif %}
 
 <hr>
@@ -37,5 +38,6 @@
       </div>
     </div>
   </div>
+</div>
 </div>
 {% endblock content %}

@@ -2,6 +2,7 @@
 
 {% block title %}Profile page{% endblock title %}
 {% block content %}
+<div class="container content white shadow"><br>
 <h1>Welcome to your profile page {{ user.name }}!</h1>
 
 <a href="/new_message">New message</a><br>
@@ -9,5 +10,5 @@
 <a href="/sent">Sent</a><br>
 <a href="/home">View posts</a><br>
 <a href="/addpost">New post</a><br>
-
+</div>
 {% endblock %}

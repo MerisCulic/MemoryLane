@@ -17,7 +17,7 @@
   </head>
   <body>
     {% block navbar %}
-    <nav class="navbar navbar-expand-lg navbar-dark shadow">
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark shadow">
       <a class="navbar-brand" href="/home">Memory lane</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -25,9 +25,7 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
           <a class="nav-item nav-link active" href="/profile">Profile <span class="sr-only">(current)</span></a>
-          <a class="nav-item nav-link active" href="/new_message">New message</a>
-          <a class="nav-item nav-link active" href="/inbox">Inbox</a>
-          <a class="nav-item nav-link active" href="/sent">Sent</a>
+          <a class="nav-item nav-link active" href="/inbox">Messages</a>
           <a class="nav-item nav-link active" href="/users">Users</a>
           <a class="nav-item nav-link active" href="/logout">Logout</a>
         </div>
@@ -36,11 +34,11 @@
     {% endblock navbar %}
 
     <!--flash messages-->
-    <div class="container">
+    <div class="container flash">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
-            <br><div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <br><div class="alert alert-{{ category }} alert-dismissible fade show flash" role="alert">
               <span>{{ message }}</span>
               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -54,11 +52,13 @@
     {% block header %}
     {% endblock header %}
 
-    <div class="container content shadow"><br>
+    <!--<div class="container content shadow"><br>-->
     {% block content %}
 
     {% endblock content %}
+<!--
     </div>
+-->
     {% block scripts %}
     <!-- Optional JavaScript -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>

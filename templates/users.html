@@ -2,7 +2,8 @@
 
 {% block title %}Registered users{% endblock title %}
 {% block content %}
-<h3>List of Das Mail users:</h3>
+<div class="container content white shadow"><br>
+<h3>List of registered Memory lane users:</h3>
 <hr>
 {% for user in users %}
 <ul>
@@ -10,4 +11,5 @@
     <hr>
 </ul>
 {% endfor %}
+</div>
 {% endblock %}

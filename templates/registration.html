@@ -1,12 +1,15 @@
 {% extends 'layout.html' %}
 {% block title %}Registration page{% endblock title %}
 {% block content %}
+<div class="container content white shadow"><br>
 <form method="post" action="/register">
-    <input type="text" name="user-name" placeholder="Enter your name"><br>
+    <input type="text" name="user-firstname" placeholder="Enter your first name"><br>
+    <input type="text" name="user-surname" placeholder="Enter your surname"><br>
     <input type="email" name="user-email" placeholder="Enter your email address"><br>
     <input type="password" name="user-password" placeholder="Enter your password"><br>
     <input type="password" name="confirm-user-password" placeholder="Re-enter your password"><br>
 
     <button>Submit</button>
 </form>
+</div>
 {% endblock content %}

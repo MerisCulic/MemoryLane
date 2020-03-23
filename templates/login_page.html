@@ -1,10 +1,12 @@
 {% extends 'layout.html' %}
 {% block title %}Login page{% endblock title %}
 {% block content %}
+<div class="container content white shadow"><br>
 <form method="post" action="/login">
     <input type="email" name="user-email" placeholder="Enter your email address"><br>
     <input type="password" name="user-password" placeholder="Enter your password"><br>
 
     <button>Submit</button>
 </form>
+</div>
 {% endblock content %}

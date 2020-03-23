@@ -14,7 +14,8 @@ class User(db.Model):
 
 class Messages(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    sender = db.Column(db.String)
+    sender_email = db.Column(db.String)
+    sender_name = db.Column(db.String)
     reciever = db.Column(db.String)
     title = db.Column(db.String)
     date_posted = db.Column(db.DateTime)
@@ -24,7 +25,7 @@ class Messages(db.Model):
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50))
-    author = db.Column(db.String(30))
+    author = db.Column(db.String)
     date_posted = db.Column(db.DateTime)
     content = db.Column(db.Text)
 

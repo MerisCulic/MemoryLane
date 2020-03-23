@@ -2,17 +2,17 @@
 
 {% block title %}{{ post.title }}{% endblock title %}
 {% block content %}
-
+<div class="container content white shadow"><br>
 <!-- Page Header -->
 <header class="masthead">
   <div class="container">
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
         <div class="post-heading">
-          <h1>{{ post.title }}</h1>
-          <span class="meta">Posted by
+          <h3>{{ post.title }}</h3>
+          <span class="meta"><i>Posted by
             {{ post.author }}
-            on {{ post.date_posted.strftime('%B %d, %Y') }}</span>
+            on {{ post.date_posted.strftime('%B %d, %Y') }}</i></span>
           {% if user.name == post.author %}
           <!-- Button trigger modal -->
           <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
@@ -54,5 +54,5 @@
   </div>
 </article>
 
-
+</div>
 {% endblock content %}

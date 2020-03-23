@@ -22,15 +22,17 @@ def index():
 
 
 @app.route("/register", methods=["GET", "POST"])
-def registration():
+def register():
     if request.method == "GET":
         return render_template("registration.html")
 
     if request.method == "POST":
-        name = request.form.get("user-name")
-        email = request.form.get("user-email")
-        password = request.form.get("user-password")
-        confirm_password = request.form.get("confirm-user-password")
+        first_name = request.form.get("user-firstname").strip()
+        surname = request.form.get("user-surname").strip()
+        email = request.form.get("user-email").strip()
+        password = request.form.get("user-password").strip()
+        confirm_password = request.form.get("confirm-user-password").strip()
+        name = first_name + " " + surname
 
         if not len(password) >= 5:
             flash("Password length must be at least 5 characters", "warning")
@@ -73,7 +75,7 @@ def login():
 
         if not user:
             flash("Sorry, you weren't found in the database. Please register!", "warning")
-            return redirect(url_for('registration'))
+            return redirect(url_for('register'))
 
         if hashed_password != user.password:
             flash("Wrong password! Please try again!", "warning")
@@ -113,6 +115,11 @@ def profile():
         return render_template('index.html')
 
 
+@app.route('/messages')
+def messages():
+
+    return render_template('messages.html')
+
 @app.route("/new_message", methods=["GET", "POST"])
 def new_message():
     session_token = request.cookies.get("session_token")
@@ -129,9 +136,8 @@ def new_message():
         reciever = request.form.get("reciever")
         title = request.form.get("title")
         message_text = request.form.get("message_text")
-        sender = user.email
 
-        message = Messages(reciever=reciever, sender=sender, title=title,
+        message = Messages(reciever=reciever, sender_email=user.email, sender_name=user.name, title=title,
                            message_text=message_text, date_posted=datetime.now())
 
         db.add(message)
@@ -145,9 +151,8 @@ def new_message():
 def sent_messages():
     session_token = request.cookies.get("session_token")
     user = db.query(User).filter_by(session_token=session_token).first()
-    sender = user.email
 
-    sent_messages = db.query(Messages).filter_by(sender=sender).order_by(Messages.date_posted.desc()).all()
+    sent_messages = db.query(Messages).filter_by(sender_email=user.email).order_by(Messages.date_posted.desc()).all()
 
     if not sent_messages:
         message = "You have no sent messages!"

@@ -1,7 +1,7 @@
 body{
     background: url("/static/img/home.jpg")no-repeat;
-    position: relative;
     background-size: cover;
+    background-attachment: fixed;
 }
 
 .navbar{
@@ -9,12 +9,49 @@ body{
     background: linear-gradient(180deg, rgba(244,244,246,1) 0%, rgba(164,175,163,0.6166841736694677) 45%);
 }
 
-.content {
+.flash {
     margin-top: 50px;
-    padding: 20px;
-    background-color: white;
-    position: relative;
+    border-radius: 15px;
+    width: 30vw;
 }
+
+.content {
+    margin-top: 150px;
+    padding: 20px;
+    position: relative;
+    border-radius: 15px;
+}
+
+.white{
+    background-color: white;
+}
+
+.messages{
+    border-radius: 15px;
+    padding: 20px;
+}
+
+a {
+    color: black;
+}
+
+a:hover {
+    text-decoration: none;
+    color: gray;
+}
+
+.sidemenu a {
+    text-decoration: none;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.sidemenu a:hover {
+    text-shadow: 3px 6px 4px rgba(7,4,4,0.38);
+}
+
+
 
 .blur{
     filter: blur(8px);

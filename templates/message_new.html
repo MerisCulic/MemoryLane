@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'messages.html' %}
 {% block title %}New message{% endblock title %}
-{% block content %}
+{% block messages %}
 <form method="post" action="/new_message">
     <input type="text" name="title" placeholder="Subject"><br>
     <input type="email" name="reciever" placeholder="To"><br>
@@ -8,4 +8,4 @@
 
     <button>Send</button>
 </form>
-{% endblock content %}
+{% endblock messages %}
