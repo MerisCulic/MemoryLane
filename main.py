@@ -115,11 +115,6 @@ def profile():
         return render_template('index.html')
 
 
-@app.route('/messages')
-def messages():
-
-    return render_template('messages.html')
-
 @app.route("/new_message", methods=["GET", "POST"])
 def new_message():
     session_token = request.cookies.get("session_token")

@@ -2,7 +2,7 @@ from sqla_wrapper import SQLAlchemy
 import os
 
 
-db = SQLAlchemy(os.getenv("DATABASE_URL", "sqlite:///localhost.sqlite")) #TODO: Change localhost to heroku
+db = SQLAlchemy(os.getenv("DATABASE_URL", "sqlite:///localhost.sqlite?check_same_thread=False")) #TODO: Change localhost to heroku
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
