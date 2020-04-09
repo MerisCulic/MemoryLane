@@ -238,9 +238,12 @@ def addpost():
 
 @app.route('/home', methods=['GET'])
 def home():
+    session_token = request.cookies.get("session_token")
+    user = db.query(User).filter_by(session_token=session_token).first()
+
     posts = db.query(Posts).order_by(Posts.date_posted.desc()).all()
 
-    return render_template('home.html', posts=posts)
+    return render_template('home.html', posts=posts, user=user)
 
 
 @app.route('/post/<int:post_id>')
@@ -267,7 +270,7 @@ def post_delete(post_id):
         db.commit()
 
         flash("Your post was deleted!", "success")
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
     else:
         return redirect(url_for('index'))
