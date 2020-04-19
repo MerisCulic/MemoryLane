@@ -12,7 +12,7 @@ body{
 
 .flash {
     border-radius: 15px;
-    width: 30vw;
+    text-align: center;
 }
 
 .content {
@@ -24,6 +24,8 @@ body{
 
 .white{
     background-color: white;
+    padding: 30px;
+    border-radius:10px;
 }
 
 .messages{

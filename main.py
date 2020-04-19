@@ -2,12 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, make_respo
 import uuid
 import hashlib
 from models import User, Messages, db, Posts
+from forms import RegistrationForm, LoginForm
 from datetime import datetime
 
 
 app = Flask(__name__)
 db.create_all()
-app.secret_key = b'\xbf,\x92\xda\x11\x844\xae\xf4i\xd36\x01\xef\xa4\xde\x8f\xc4\xbb\x0b\x99(\xad\xb4'
+app.config['SECRET_KEY'] = b'\xbf,\x92\xda\x11\x844\xae\xf4i\xd36\x01\xef\xb4'
 
 
 @app.route("/")
@@ -23,29 +24,17 @@ def index():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    if request.method == "GET":
-        return render_template("registration.html")
-
-    if request.method == "POST":
-        first_name = request.form.get("user-firstname").strip()
-        surname = request.form.get("user-surname").strip()
-        email = request.form.get("user-email").strip()
-        password = request.form.get("user-password").strip()
-        confirm_password = request.form.get("confirm-user-password").strip()
-        name = first_name + " " + surname
-
-        if not len(password) >= 5:
-            flash("Password length must be at least 5 characters", "warning")
-            return redirect(request.url)
-
-        if confirm_password != password:
-            flash("Your passwords don't match!", "warning")
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = db.query(User).filter_by(email=form.email.data).first()
+        if user:
+            flash("That email address is already taken! Please enter a different one.", "warning")
             return redirect(request.url)
 
         else:
-            hashed_password = hashlib.sha256(password.encode()).hexdigest()
-
-            user = User(name=name, email=email, password=hashed_password)
+            name = form.firstname.data + " " + form.surname.data
+            hashed_password = hashlib.sha256(form.password.data.encode()).hexdigest()
+            user = User(name=name, email=form.email.data, password=hashed_password)
 
             session_token = str(uuid.uuid4())
             user.session_token = session_token
@@ -55,30 +44,28 @@ def register():
 
             response = make_response(redirect(url_for('profile', user=user)))
             response.set_cookie("session_token", session_token, httponly=True, samesite='Strict')
-            flash('Account successfully created!', 'success')
-
+            flash('Welcome to Memory Lane {}! '
+                  'Your account has been successfully created!'.format(form.firstname.data), 'success')
             return response
+    return render_template("registration.html", form=form)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == "GET":
-        return render_template("login_page.html")
+    form = LoginForm()
 
-    if request.method == "POST":
-        email = request.form.get("user-email")
-        password = request.form.get("user-password")
+    if form.validate_on_submit():
 
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        hashed_password = hashlib.sha256(form.password.data.encode()).hexdigest()
 
-        user = db.query(User).filter_by(email=email).first()
+        user = db.query(User).filter_by(email=form.email.data).first()
 
         if not user:
-            flash("Sorry, you weren't found in the database. Please register!", "warning")
+            flash("Sorry, you weren't found in the database. Please register!", "danger")
             return redirect(url_for('register'))
 
         if hashed_password != user.password:
-            flash("Wrong password! Please try again!", "warning")
+            flash("Wrong password! Please try again!", "danger")
             return redirect(request.url)
 
         elif hashed_password == user.password:
@@ -90,9 +77,10 @@ def login():
 
             response = make_response(redirect(url_for('profile', user=user)))
             response.set_cookie("session_token", session_token, httponly=True, samesite='Strict')
-            flash('You were successfully logged in', 'success')
+            flash('You were successfully logged in!', 'success')
 
             return response
+    return render_template("login_page.html", form=form)
 
 
 @app.route('/logout', methods=["GET"])
@@ -110,8 +98,10 @@ def profile():
 
     if session_token:
         user = db.query(User).filter_by(session_token=session_token).first()
-        return render_template("profile.html", user=user)
+        image_file = url_for('static', filename='img/default_avatar.jpg')
+        return render_template("profile.html", user=user, image_file=image_file)
     else:
+        flash('You need to be logged in to view profile pages!', 'danger')
         return render_template('index.html')
 
 
