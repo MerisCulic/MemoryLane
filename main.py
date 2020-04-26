@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, make_response, flash
+import os
 import uuid
 import hashlib
+import secrets
+from PIL import Image
+from flask import Flask, render_template, request, redirect, url_for, make_response, flash
 from models import User, Messages, db, Posts
-from forms import RegistrationForm, LoginForm
+from forms import RegistrationForm, LoginForm, UpdateProfileForm
 from datetime import datetime
 
 
@@ -14,10 +17,9 @@ app.config['SECRET_KEY'] = b'\xbf,\x92\xda\x11\x844\xae\xf4i\xd36\x01\xef\xb4'
 @app.route("/")
 def index():
     session_token = request.cookies.get("session_token")
-
     if session_token:
         user = db.query(User).filter_by(session_token=session_token).first()
-        return render_template('profile.html', user=user)
+        return redirect(url_for('profile', user=user))
     else:
         return render_template('index.html')
 
@@ -26,15 +28,11 @@ def index():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = db.query(User).filter_by(email=form.email.data).first()
-        if user:
-            flash("That email address is already taken! Please enter a different one.", "warning")
-            return redirect(request.url)
 
-        else:
             name = form.firstname.data + " " + form.surname.data
             hashed_password = hashlib.sha256(form.password.data.encode()).hexdigest()
-            user = User(name=name, email=form.email.data, password=hashed_password)
+            user = User(name=name, firstname=form.firstname.data, surname=form.surname.data,
+                        email=form.email.data, password=hashed_password, image_file='default_avatar.jpg')
 
             session_token = str(uuid.uuid4())
             user.session_token = session_token
@@ -55,14 +53,12 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-
-        hashed_password = hashlib.sha256(form.password.data.encode()).hexdigest()
-
         user = db.query(User).filter_by(email=form.email.data).first()
-
         if not user:
             flash("Sorry, you weren't found in the database. Please register!", "danger")
             return redirect(url_for('register'))
+
+        hashed_password = hashlib.sha256(form.password.data.encode()).hexdigest()
 
         if hashed_password != user.password:
             flash("Wrong password! Please try again!", "danger")
@@ -78,8 +74,8 @@ def login():
             response = make_response(redirect(url_for('profile', user=user)))
             response.set_cookie("session_token", session_token, httponly=True, samesite='Strict')
             flash('You were successfully logged in!', 'success')
-
             return response
+
     return render_template("login_page.html", form=form)
 
 
@@ -92,16 +88,62 @@ def logout():
     return response
 
 
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    f_name, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/img/profile_pics', picture_fn)
+
+    output_size = (250, 250)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+
+    i.save(picture_path)
+
+    return picture_fn
+
+
 @app.route('/profile', methods=["GET"])
 def profile():
     session_token = request.cookies.get("session_token")
 
     if session_token:
         user = db.query(User).filter_by(session_token=session_token).first()
-        image_file = url_for('static', filename='img/default_avatar.jpg')
+        image_file = url_for('static', filename='img/profile_pics/' + user.image_file)
         return render_template("profile.html", user=user, image_file=image_file)
     else:
         flash('You need to be logged in to view profile pages!', 'danger')
+        return render_template('index.html')
+
+
+@app.route('/update_profile', methods=["GET", "POST"])
+def update_profile():
+    session_token = request.cookies.get("session_token")
+    if session_token:
+        user = db.query(User).filter_by(session_token=session_token).first()
+        form = UpdateProfileForm()
+        if form.validate_on_submit():
+            if form.picture.data:
+                picture_file = save_picture(form.picture.data)
+                user.image_file = picture_file
+
+            user.firstname = form.firstname.data
+            user.surname = form.surname.data
+            user.email = form.email.data
+            user.name = form.firstname.data + " " + form.surname.data
+
+            db.commit()
+            flash('Your profile was successfully updated!', 'success')
+            return redirect(url_for('profile'))
+
+        elif request.method == "GET":
+            form.firstname.data = user.firstname
+            form.surname.data = user.surname
+            form.email.data = user.email
+
+        return render_template("update_profile.html", user=user, form=form)
+    else:
+        flash('You need to be logged in to edit your profile page!', 'danger')
         return render_template('index.html')
 
 
@@ -267,4 +309,4 @@ def post_delete(post_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True) #TODO: Disable debug before deployment

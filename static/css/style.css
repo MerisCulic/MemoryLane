@@ -10,7 +10,7 @@ body{
     background: linear-gradient(180deg, rgba(244,244,246,1) 0%, rgba(164,175,163,0.6166841736694677) 45%);
 }
 
-.flash {
+.flash-msg {
     border-radius: 15px;
     text-align: center;
 }
