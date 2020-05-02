@@ -1,7 +1,7 @@
 from models import db, User
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask import request
 
@@ -42,3 +42,9 @@ class UpdateProfileForm(FlaskForm):
             user = db.query(User).filter_by(email=email.data).first()
             if user:
                 raise ValidationError('That email address is already taken! Please enter a different one.')
+
+
+class PostForm(FlaskForm):
+    title = StringField('Title', render_kw={"placeholder": "You can add a post title here."})
+    content = TextAreaField('Content', validators=[DataRequired()], render_kw={"placeholder": "Want to share something with the others?"})
+    submit = SubmitField('Submit')
