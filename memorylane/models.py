@@ -1,8 +1,5 @@
-from sqla_wrapper import SQLAlchemy
-import os
+from memorylane import db
 
-
-db = SQLAlchemy(os.getenv("DATABASE_URL", "sqlite:///localhost.sqlite?check_same_thread=False")) #TODO: Change localhost to heroku
 
 class User(db.Model):
     __tablename__ = 'user'
