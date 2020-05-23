@@ -1,9 +1,9 @@
 from memorylane.models import User
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from flask import request
+from flask_login import current_user
 
 
 class RegistrationForm(FlaskForm):
@@ -22,6 +22,7 @@ class RegistrationForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 
@@ -33,9 +34,7 @@ class UpdateProfileForm(FlaskForm):
     submit = SubmitField('Update')
 
     def validate_email(self, email):
-        session_token = request.cookies.get("session_token")
-        user = User.query.filter_by(session_token=session_token).first()
-        if email.data != user.email:
+        if email.data != current_user.email:
             user = User.query.filter_by(email=email.data).first()
             if user:
                 raise ValidationError('That email address is already taken! Please enter a different one.')

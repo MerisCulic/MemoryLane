@@ -7,7 +7,11 @@
 <hr>
 {% for user in users %}
 <ul>
-    <li><a href="{{ url_for('user_profile', user_id=user.id) }}">{{ user.name }}</a></li>
+    <li>
+        <a href="{{ url_for('user_profile', user_id=user.id) }}">
+        <img class="rounded-circle" width="50" style="margin-right: 10px" src="static/img/profile_pics/{{user.image_file }}">
+        {{ user.name }}</a>
+    </li>
     <hr>
 </ul>
 {% endfor %}

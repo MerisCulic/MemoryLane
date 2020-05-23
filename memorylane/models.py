@@ -1,7 +1,12 @@
-from memorylane import db
+from memorylane import db, login_manager
+from flask_login import UserMixin
 
 
-class User(db.Model):
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+class User(db.Model, UserMixin):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String)
@@ -10,7 +15,6 @@ class User(db.Model):
     email = db.Column(db.String, unique=True)
     password = db.Column(db.String)
     image_file = db.Column(db.String(20), default='default_avatar.jpg')
-    session_token = db.Column(db.String)
     posts = db.relationship('Posts', backref='author', lazy=True)
 
 

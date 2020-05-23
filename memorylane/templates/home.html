@@ -90,7 +90,7 @@
                         <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o">{{ post.date_posted.strftime('%B %d, %Y') }}</i></div>
                     </div>
                 </div>
-                {% if user.name == post.author.name %}
+                {% if current_user == post.author %}
                 <div>
                     <div class="dropdown">
                         <button class="btn dropdown-toggle btn-outline-info" type="button" id="gedf-drop11" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

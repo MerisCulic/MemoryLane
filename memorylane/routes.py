@@ -1,39 +1,37 @@
 import os
-import uuid
 import hashlib
 import secrets
 from PIL import Image
 from datetime import datetime
-from flask import render_template, request, redirect, url_for, make_response, flash, abort
+from flask import render_template, request, redirect, url_for, flash, abort
 from memorylane import app, db
 from memorylane.models import User, Messages, Posts
 from memorylane.forms import RegistrationForm, LoginForm, UpdateProfileForm, PostForm, PostEditForm
+from flask_login import login_user, current_user, logout_user, login_required
 
 
 @app.route("/")
 def index():
-    session_token = request.cookies.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-    if user:
-        return redirect(url_for('profile', user=user))
+    if current_user:
+        return redirect(url_for('profile', user=current_user))
     else:
         return render_template('index.html')
 
 
 @app.route('/home', methods=['GET'])
+@login_required
 def home():
-    session_token = request.cookies.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
     form = PostForm()
-
     page = int(request.args.get('page', 1))
     posts = Posts.query.order_by(Posts.date_posted.desc()).paginate(page=page, per_page=5, error_out=False)
 
-    return render_template('home.html', posts=posts, user=user, form=form)
+    return render_template('home.html', posts=posts, user=current_user, form=form)
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('profile'))
     form = RegistrationForm()
     if form.validate_on_submit():
 
@@ -42,24 +40,23 @@ def register():
         user = User(name=name, firstname=form.firstname.data, surname=form.surname.data,
                     email=form.email.data, password=hashed_password)
 
-        session_token = str(uuid.uuid4())
-        user.session_token = session_token
-
         db.session.add(user)
         db.session.commit()
 
-        response = make_response(redirect(url_for('profile', user=user)))
-        response.set_cookie("session_token", session_token, httponly=True, samesite='Strict')
+        login_user(user)
+
         flash('Welcome to Memory Lane {}! '
               'Your account has been successfully created!'.format(form.firstname.data), 'success')
-        return response
+        return redirect(url_for('profile', user=current_user))
     return render_template("registration.html", form=form)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    form = LoginForm()
+    if current_user.is_authenticated:
+        return redirect(url_for('profile'))
 
+    form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if not user:
@@ -67,33 +64,24 @@ def login():
             return redirect(url_for('register'))
 
         hashed_password = hashlib.sha256(form.password.data.encode()).hexdigest()
-
         if hashed_password != user.password:
             flash("Wrong password! Please try again!", "danger")
             return redirect(request.url)
 
         elif hashed_password == user.password:
-            session_token = str(uuid.uuid4())
-
-            user.session_token = session_token
-            db.session.add(user)
-            db.session.commit()
-
-            response = make_response(redirect(url_for('profile', user=user)))
-            response.set_cookie("session_token", session_token, httponly=True, samesite='Strict')
+            login_user(user, remember=form.remember.data)
+            next_page = request.args.get('next')
             flash('You were successfully logged in!', 'success')
-            return response
-
+            return redirect(next_page) if next_page else redirect(url_for('profile', user=user))
     return render_template("login_page.html", form=form)
 
 
 @app.route('/logout', methods=["GET"])
+@login_required
 def logout():
-
-    response = make_response(redirect(url_for('index')))
-    response.set_cookie("session_token", expires=0)
+    logout_user()
     flash('You were successfully logged out!', 'success')
-    return response
+    return redirect(url_for('index'))
 
 
 def save_picture(form_picture):
@@ -112,91 +100,75 @@ def save_picture(form_picture):
 
 
 @app.route('/profile', methods=["GET"])
+@login_required
 def profile():
-    session_token = request.cookies.get("session_token")
-
-    if session_token:
-        user = User.query.filter_by(session_token=session_token).first()
-        image_file = url_for('static', filename='img/profile_pics/' + user.image_file)
-        page = int(request.args.get('page', 1))
-        posts = Posts.query \
-            .filter_by(author=user) \
-            .order_by(Posts.date_posted.desc()) \
-            .paginate(page=page, per_page=5, error_out=False)
-
-        return render_template("profile.html", user=user, image_file=image_file, posts=posts)
-    else:
+    if not current_user:
         flash('You need to be logged in to view profile pages!', 'danger')
         return render_template('index.html')
+
+    image_file = url_for('static', filename='img/profile_pics/' + current_user.image_file)
+    page = int(request.args.get('page', 1))
+    posts = Posts.query \
+        .filter_by(author=current_user) \
+        .order_by(Posts.date_posted.desc()) \
+        .paginate(page=page, per_page=5, error_out=False)
+
+    return render_template("profile.html", user=current_user, image_file=image_file, posts=posts)
+
 
 
 @app.route('/profile/<user_id>', methods=["GET"])
+@login_required
 def user_profile(user_id):
-    session_token = request.cookies.get("session_token")
-    if session_token:
-        user = User.query.get(int(user_id))
-        page = int(request.args.get('page', 1))
-        posts = Posts.query\
-            .filter_by(author=user)\
-            .order_by(Posts.date_posted.desc())\
-            .paginate(page=page, per_page=5, error_out=False)
+    user = User.query.get(int(user_id))
+    page = int(request.args.get('page', 1))
+    posts = Posts.query\
+        .filter_by(author=user)\
+        .order_by(Posts.date_posted.desc())\
+        .paginate(page=page, per_page=5, error_out=False)
 
-        image_file = url_for('static', filename='img/profile_pics/' + user.image_file)
-        return render_template("profile.html", posts=posts, user=user, image_file=image_file)
-    else:
-        flash('You need to be logged in to view profile pages!', 'danger')
-        return render_template('index.html')
+    image_file = url_for('static', filename='img/profile_pics/' + user.image_file)
+    return render_template("profile.html", posts=posts, user=user, image_file=image_file)
 
 
 @app.route('/update_profile', methods=["GET", "POST"])
+@login_required
 def update_profile():
-    session_token = request.cookies.get("session_token")
-    if session_token:
-        user = User.query.filter_by(session_token=session_token).first()
-        form = UpdateProfileForm()
-        if form.validate_on_submit():
-            if form.picture.data:
-                picture_file = save_picture(form.picture.data)
-                user.image_file = picture_file
+    form = UpdateProfileForm()
+    if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
 
-            user.firstname = form.firstname.data
-            user.surname = form.surname.data
-            user.email = form.email.data
-            user.name = form.firstname.data + " " + form.surname.data
+        current_user.firstname = form.firstname.data
+        current_user.surname = form.surname.data
+        current_user.email = form.email.data
+        current_user.name = form.firstname.data + " " + form.surname.data
 
-            db.session.commit()
-            flash('Your profile was successfully updated!', 'success')
-            return redirect(url_for('profile'))
+        db.session.commit()
+        flash('Your profile was successfully updated!', 'success')
+        return redirect(url_for('profile'))
 
-        elif request.method == "GET":
-            form.firstname.data = user.firstname
-            form.surname.data = user.surname
-            form.email.data = user.email
+    elif request.method == "GET":
+        form.firstname.data = current_user.firstname
+        form.surname.data = current_user.surname
+        form.email.data = current_user.email
 
-        return render_template("profile_edit.html", user=user, form=form)
-    else:
-        flash('You need to be logged in to edit your profile page!', 'danger')
-        return render_template('index.html')
+    return render_template("profile_edit.html", user=current_user, form=form)
 
 
 @app.route("/new_message", methods=["GET", "POST"])
+@login_required
 def new_message():
-    session_token = request.cookies.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-
     if request.method == "GET":
-        if user:
-            return render_template("message_new.html")
-        else:
-            return render_template('index.html')
+        return render_template("message_new.html")
 
     if request.method == "POST":
-
         reciever = request.form.get("reciever")
         title = request.form.get("title")
         message_text = request.form.get("message_text")
 
-        message = Messages(reciever=reciever, sender_email=user.email, sender_name=user.name, title=title,
+        message = Messages(reciever=reciever, sender_email=current_user.email, sender_name=current_user.name, title=title,
                            message_text=message_text, date_posted=datetime.now())
 
         db.session.add(message)
@@ -207,39 +179,34 @@ def new_message():
 
 
 @app.route('/sent', methods=["GET"])
+@login_required
 def sent_messages():
-    session_token = request.cookies.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-
-    sent_messages = Messages.query.filter_by(sender_email=user.email).order_by(Messages.date_posted.desc()).all()
+    sent_messages = Messages.query.filter_by(sender_email=current_user.email).order_by(Messages.date_posted.desc()).all()
 
     if not sent_messages:
         message = "You have no sent messages!"
     else:
         message = "These are your sent messages"
 
-    return render_template('messages_sent.html', sent_messages=sent_messages, user=user, message=message)
+    return render_template('messages_sent.html', sent_messages=sent_messages, user=current_user, message=message)
 
 
 @app.route('/inbox', methods=["GET"])
+@login_required
 def recieved_messages():
-    session_token = request.cookies.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-    reciever = user.email
-
-    recieved_messages = Messages.query.filter_by(reciever=reciever).order_by(Messages.date_posted.desc()).all()
+    recieved_messages = Messages.query.filter_by(reciever=current_user.email).order_by(Messages.date_posted.desc()).all()
 
     if not recieved_messages:
         message = "Your inbox is empty!"
     else:
         message = "Inbox"
 
-    return render_template('messages_recieved.html', recieved_messages=recieved_messages, user=user, message=message)
+    return render_template('messages_recieved.html', recieved_messages=recieved_messages, user=current_user, message=message)
 
 
 @app.route("/<string:status>/<msg_id>", methods=["GET"])
+@login_required
 def message_details(status, msg_id):
-
     msg = Messages.query.get(int(msg_id))
 
     return render_template('message_details.html', msg=msg, msg_id=msg_id, status=status)
@@ -247,67 +214,50 @@ def message_details(status, msg_id):
 
 @app.route("/<int:msg_id>/delete", methods=['POST'])
 def message_delete(msg_id):
-    session_token = request.cookies.get("session_token")
-    if session_token:
+    msg = Messages.query.get(msg_id)
+    db.session.delete(msg)
+    db.session.commit()
 
-        msg = Messages.query.get(msg_id)
-        db.session.delete(msg)
-        db.session.commit()
-
-        flash("Message was deleted!", "success")
-        return redirect(url_for('index'))
-
-    else:
-        return redirect(url_for('index'))
+    flash("Message was deleted!", "success")
+    return redirect(url_for('index'))
 
 
 @app.route('/users')
+@login_required
 def users():
     users = User.query.all()
     return render_template('users.html', users=users)
 
 
 @app.route('/addpost', methods=["GET", "POST"])
+@login_required
 def addpost():
-    session_token = request.cookies.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-    if user:
-        form = PostForm()
-        if form.validate_on_submit():
-            post = Posts(title=form.title.data, content=form.content.data, user_id=user.id, date_posted=datetime.now())
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Posts(title=form.title.data, content=form.content.data, user_id=current_user.id, date_posted=datetime.now())
 
-            db.session.add(post)
-            db.session.commit()
+        db.session.add(post)
+        db.session.commit()
 
-            flash('Post added!', 'success')
-            return redirect(url_for('home'))
-        return render_template('home.html', form=form)
-    else:
-        return render_template('index.html')
+        flash('Post added!', 'success')
+        return redirect(url_for('home'))
+    return render_template('home.html', form=form)
 
 
 @app.route('/post/<int:post_id>')
 def post(post_id):
-    session_token = request.cookies.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-
     post = Posts.query.get(int(post_id))
-
     date_posted = post.date_posted.strftime('%B %d, %Y')
 
-    return render_template('post_edit.html', post=post, user=user, date_posted=date_posted)
+    return render_template('post_edit.html', post=post, user=current_user, date_posted=date_posted)
 
 
 @app.route('/post/<int:post_id>/edit', methods=["GET", "POST"])
+@login_required
 def post_edit(post_id):
-    session_token = request.cookies.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-    if not user:
-        return redirect(url_for('index'))
-
     post = Posts.query.get(int(post_id))
 
-    if post.author.name != user.name:
+    if post.author.name != current_user.name:
         abort(403)
     form = PostEditForm()
     if form.validate_on_submit():
@@ -326,12 +276,9 @@ def post_edit(post_id):
 
 @app.route('/postdelete/<int:post_id>', methods=['POST'])
 def post_delete(post_id):
-    session_token = request.cookies.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-
     post = Posts.query.get(post_id)
 
-    if post.author.name == user.name:
+    if post.author.id == current_user.id:
         db.session.delete(post)
         db.session.commit()
 
