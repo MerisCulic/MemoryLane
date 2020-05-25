@@ -1,7 +1,7 @@
-{% extends 'landing_page.html' %}
+{% extends 'base.html' %}
 {% block title %}Login page{% endblock title %}
 {% block content %}
-
+<div class="container">
 <div class="content-section white shadow">
     <form method="POST" action="{{ url_for('login') }}">
         {{ form.hidden_tag() }}
@@ -51,4 +51,5 @@
         Need An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign Up Now</a>
     </small>
 </div>
+    </div>
 {% endblock content %}

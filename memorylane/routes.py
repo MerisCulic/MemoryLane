@@ -12,7 +12,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 
 @app.route("/")
 def index():
-    if current_user:
+    if current_user.is_authenticated:
         return redirect(url_for('profile', user=current_user))
     else:
         return render_template('index.html')
@@ -102,10 +102,6 @@ def save_picture(form_picture):
 @app.route('/profile', methods=["GET"])
 @login_required
 def profile():
-    if not current_user:
-        flash('You need to be logged in to view profile pages!', 'danger')
-        return render_template('index.html')
-
     image_file = url_for('static', filename='img/profile_pics/' + current_user.image_file)
     page = int(request.args.get('page', 1))
     posts = Posts.query \

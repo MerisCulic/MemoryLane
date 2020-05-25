@@ -9,6 +9,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
-login_manager.login_message = None
+login_manager.login_message = 'You need to be logged in to view that page!'
+login_manager.login_message_category = 'info'
 
 from memorylane import routes

@@ -19,6 +19,7 @@
     {% endblock head %}
   </head>
   <body>
+  {% if current_user.is_authenticated %}
     {% block navbar %}
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark shadow">
       <a class="navbar-brand" href="/home">Memory lane</a>
@@ -35,6 +36,7 @@
       </div>
     </nav>
     {% endblock navbar %}
+  {% endif %}
 
     <!--flash messages-->
     <div class="container">
