@@ -32,7 +32,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <form action="{{ url_for('message_delete', msg_id=msg.id) }}" method="POST">
+        <form action="{{ url_for('messages.message_delete', msg_id=msg.id) }}" method="POST">
             <input class="btn btn-danger" type="submit" value="Delete">
         </form>
       </div>

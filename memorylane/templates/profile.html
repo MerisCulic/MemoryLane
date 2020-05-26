@@ -41,7 +41,7 @@
                         </div>
                         <div><br>
                             {% if current_user.id == user.id %}
-                                <a class="btn btn-primary btn-sm" href="{{ url_for('update_profile')}}" role="button">Update profile</a>
+                                <a class="btn btn-primary btn-sm" href="{{ url_for('users.update_profile')}}" role="button">Update profile</a>
                             {% endif %}
                         </div>
                     </div>
@@ -91,7 +91,7 @@
                                         <img class="rounded-circle" width="70" src="{{ image_file }}" alt="">
                                     </div>
                                     <div class="ml-2">
-                                        <div class="h5 m-0 text-blue"><a href="{{ url_for('user_profile', user_id=post.author.id) }}"> {{ post.author.name }}</a></div>
+                                        <div class="h5 m-0 text-blue"><a href="{{ url_for('users.user_profile', user_id=post.author.id) }}"> {{ post.author.name }}</a></div>
                                         <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o">{{ post.date_posted.strftime('%B %d, %Y') }}</i></div>
                                     </div>
                                 </div>
@@ -103,7 +103,7 @@
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop11">
                                             <div class="h6 dropdown-header">Options</div>
-                                            <a class="dropdown-item" href="{{ url_for('post_edit', post_id=post.id) }}">Edit</a>
+                                            <a class="dropdown-item" href="{{ url_for('posts.post_edit', post_id=post.id) }}">Edit</a>
                                             <a class="dropdown-item" data-toggle="modal" data-target="#deleteModal" href="#">Delete</a>
                                         </div>
                                     </div>
@@ -135,7 +135,7 @@
                               </button>
                             </div>
                             <div class="modal-footer">
-                                <form action="{{ url_for('post_delete', post_id=post.id, user=user) }}" method="POST">
+                                <form action="{{ url_for('posts.post_delete', post_id=post.id, user=user) }}" method="POST">
                                   <input class="btn btn-danger" type="submit" value="Delete">
                                 </form>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -149,9 +149,9 @@
                     <!--{% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=3) %}
                         {% if page_num %}
                             {% if posts.page == page_num %}
-                                <a class="btn btn-primary mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+                                <a class="btn btn-primary mb-4" href="{{ url_for('posts.home', page=page_num) }}">{{ page_num }}</a>
                             {% else %}
-                                <a class="btn btn-light mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+                                <a class="btn btn-light mb-4" href="{{ url_for('posts.home', page=page_num) }}">{{ page_num }}</a>
                             {% endif %}
                         {% else %}
                             ...

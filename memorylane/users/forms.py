@@ -1,7 +1,7 @@
 from memorylane.models import User
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_login import current_user
 
@@ -40,18 +40,6 @@ class UpdateProfileForm(FlaskForm):
                 raise ValidationError('That email address is already taken! Please enter a different one.')
 
 
-class PostForm(FlaskForm):
-    title = StringField('Title', render_kw={"placeholder": "You can add a post title here."})
-    content = TextAreaField('Content', validators=[DataRequired()], render_kw={"placeholder": "Want to share something with the others?"})
-    submit = SubmitField('Share')
-
-
-class PostEditForm(FlaskForm):
-    title = StringField('Title', render_kw={"placeholder": "You can add a post title here."})
-    content = TextAreaField('Content', validators=[DataRequired()], render_kw={'class': 'form-control', 'rows': 6})
-    submit = SubmitField('Update')
-
-
 class RequestResetForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Request Password Reset')
@@ -66,3 +54,5 @@ class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=5)])
     confirm_password = PasswordField('Confirm-password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
+
+

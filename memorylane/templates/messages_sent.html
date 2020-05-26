@@ -4,7 +4,7 @@
 <h3>{{ message }}</h3>
 <ul>
 {% for msg in sent_messages %}
-    <li><a href="{{ url_for('message_details', msg_id=msg.id, status='sent')}}">{{ msg.reciever }} <strong>{{ msg.title }}</strong></a> <i>{{ msg.message_text|truncate(20) }}</i></li>
+    <li><a href="{{ url_for('messages.message_details', msg_id=msg.id, status='sent')}}">{{ msg.reciever }} <strong>{{ msg.title }}</strong></a> <i>{{ msg.message_text|truncate(20) }}</i></li>
 {% endfor %}
 </ul>
 {% endblock messages %}

@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
     <div class="content-section white shadow">
-            <form method="POST" action="{{ url_for('register') }}">
+            <form method="POST" action="{{ url_for('users.register') }}">
                 {{ form.csrf_token }}
                 <fieldset class="form-group">
                     <legend class="border-bottom mb-4">Join Today</legend>
@@ -82,7 +82,7 @@
         </div>
         <div class="border-top pt-3">
             <small class="text-muted">
-                Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Sign In</a>
+                Already Have An Account? <a class="ml-2" href="{{ url_for('users.login') }}">Sign In</a>
             </small>
         </div>
     </div>
