@@ -25,10 +25,12 @@ def create_app():
     from memorylane.posts.routes import posts
     from memorylane.messages.routes import messages
     from memorylane.main.routes import main
+    from memorylane.errors.handlers import errors
 
     app.register_blueprint(users)
     app.register_blueprint(posts)
     app.register_blueprint(messages)
     app.register_blueprint(main)
+    app.register_blueprint(errors)
 
     return app
