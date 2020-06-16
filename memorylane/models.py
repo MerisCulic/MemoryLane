@@ -18,6 +18,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String)
     image_file = db.Column(db.String(20), default='default_avatar.jpg')
     posts = db.relationship('Posts', backref='author', lazy=True)
+    comments = db.relationship('Comments', backref='com_author', lazy=True)
+
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
@@ -51,4 +53,12 @@ class Posts(db.Model):
     content = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+
+class Comments(db.Model):
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text)
+    date_posted = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    com_post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
 

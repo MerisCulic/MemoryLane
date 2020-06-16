@@ -7,16 +7,13 @@
 
 
 {% block content %}
-<!--add post-->
+<!--New post-->
 <div class="container">
     <div class="card social-timeline-card">
         <div class="card-header">
             <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="posts-tab" data-toggle="tab" href="#posts" role="tab" aria-controls="posts" aria-selected="true">Share your insights</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="images-tab" data-toggle="tab" role="tab" aria-controls="images" aria-selected="false" href="#images">Share Images</a>
+                    <a class="nav-link active" id="posts-tab" data-toggle="tab" href="#posts" role="tab" aria-controls="posts" aria-selected="true">Share your memories</a>
                 </li>
             </ul>
         </div>
@@ -75,71 +72,117 @@
     </div>
 </div>
 
-<!--- \\\\\\\Posts-->
+<!--Posts-->
 <div class="container">
     {% for post in posts.items %}
-    <div class="card social-timeline-card">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
+        <div class="card social-timeline-card">
+            <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="mr-2">
-                        <img class="rounded-circle" width="70" src="static/img/profile_pics/{{ post.author.image_file }}" alt="">
-                    </div>
-                    <div class="ml-2">
-                        <div class="h5 m-0 text-blue"><a href="{{ url_for('users.user_profile', user_id=post.author.id) }}"> {{ post.author.name }}</a></div>
-                        <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o">{{ post.date_posted.strftime('%B %d, %Y') }}</i></div>
-                    </div>
-                </div>
-                {% if current_user == post.author %}
-                <div>
-                    <div class="dropdown">
-                        <button class="btn dropdown-toggle btn-outline-info" type="button" id="gedf-drop11" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-ellipsis-h"></i>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop11">
-                            <div class="h6 dropdown-header">Options</div>
-                            <a class="dropdown-item" href="{{ url_for('posts.post_edit', post_id=post.id) }}">Edit</a>
-                            <a class="dropdown-item" data-toggle="modal" data-target="#deleteModal" href="#">Delete</a>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="mr-2">
+                            <img class="rounded-circle" width="70" src="static/img/profile_pics/{{ post.author.image_file }}" alt="">
+                        </div>
+                        <div class="ml-2">
+                            <div class="h5 m-0"><a href="{{ url_for('users.user_profile', user_id=post.author.id) }}"> {{ post.author.name }}</a></div>
+                            <div class="text-muted h7 mb-0"><i class="fa fa-clock-o">{{ post.date_posted.strftime('%B %d, %Y') }}</i></div>
+                            <div class="text-muted mb-2"><i class="fa fa-clock-o">{{ post.date_posted.strftime('%H:%M') }}</i></div>
                         </div>
                     </div>
+                    {% if current_user == post.author %}
+                    <div>
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle btn-outline-info" type="button" id="gedf-drop11" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-ellipsis-h"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop11">
+                                <div class="h6 dropdown-header">Options</div>
+                                <a class="dropdown-item" href="{{ url_for('posts.post_edit', post_id=post.id) }}">Edit</a>
+                                <a class="dropdown-item" data-toggle="modal" data-target="#deleteModal" href="#">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
+            </div>
+                <div class="card-body">
+                {% if post.title %}
+                    <h5 class="card-title">{{ post.title }}</h5>
                 {% endif %}
+                <p style="white-space: pre-wrap">{{ post.content|safe }}</p>
+            </div>
+            <div class="card-footer">
+                <a href="#" class="card-link"><i class="fa fa-gittip"></i> Like</a>
+                <a class="btn btn-outline-info" data-toggle="collapse" href="#postnumber_{{ post.id }}" role="button" aria-expanded="false" aria-controls="collapseComments">
+                Comments
+                </a>
             </div>
         </div>
-        <div class="card-body">
-            {% if post.title %}
-                <h5 class="card-title">{{ post.title }}</h5>
-            {% endif %}
-            <p style="white-space: pre-wrap">{{ post.content|safe }}</p>
+        <!-- Comments -->
+        <div class="collapse collapseComments" id="postnumber_{{ post.id }}">
+            <div class="comments mt-0 ml-5 mr-2">
+                {% for comment in comments %}
+                    {% if comment.com_post_id == post.id %}
+                        <div class="card flex-row flex-wrap">
+                            <div class="card-header border-0">
+                                <img class="img-fluid rounded-circle" width="60" src="static/img/profile_pics/{{ comment.com_author.image_file }}">
+                            </div>
+                            <div class="card-block p-2 px-3">
+                                <h6><a href="{{ url_for('users.user_profile', user_id=comment.com_author.id) }}">{{ comment.com_author.name }}</a></h6>
+                                <p class="card-text" style="white-space: pre-wrap">{{ comment.content|safe }}</p>
+                            </div>
+                            <div class="w-100"></div>
+                            <div class="card-footer w-100 text-muted">
+                                <p class="h7 m-1 pl-2"><i class="fa fa-clock-o">{{ comment.date_posted.strftime('%d. %m. %Y at %H:%M') }}</i></p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <!-- Add comment -->
+                <div class="card">
+                    <form method="POST" action="{{ url_for('posts.add_comment', post_id=post.id) }}" class="form-inline">
+                        {{ c_form.csrf_token }}
+                        <div class="col col-lg-10" style="padding: 3px">
+                            {% if c_form.content.errors %}
+                                {{ c_form.content(class="c_form-control c_form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in c_form.content.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ c_form.content(class="c_form-control") }}
+                            {% endif %}
+                        </div>
+                        <div class="col col-auto">
+                            {{ c_form.submit(class="btn btn-sm btn-outline-info") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="card-footer">
-            <a href="#" class="card-link"><i class="fa fa-gittip"></i> Like</a>
-            <a href="#" class="card-link"><i class="fa fa-comment"></i> Comment</a>
-            <a href="#" class="card-link"><i class="fa fa-mail-forward"></i> Share</a>
-        </div>
-    </div>
 
-    <!--Delete Modal -->
-      <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="deleteModalLabel">Delete this post?</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-footer">
-                <form action="{{ url_for('posts.post_delete', post_id=post.id, user=user) }}" method="POST">
-                  <input class="btn btn-danger" type="submit" value="Delete">
-                </form>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <!--Delete Modal -->
+          <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="deleteModalLabel">Delete this post?</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-footer">
+                    <form action="{{ url_for('posts.post_delete', post_id=post.id) }}" method="POST">
+                      <input class="btn btn-danger" type="submit" value="Delete">
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
     {% endfor %}
-    <div class="container" style="text-align: center">
+    <!-- Pagination -->
+    <div class="container mt-4" style="text-align: center">
     {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=3) %}
         {% if page_num %}
             {% if posts.page == page_num %}

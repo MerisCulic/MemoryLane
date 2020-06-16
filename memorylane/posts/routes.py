@@ -1,8 +1,8 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from memorylane import db
-from memorylane.models import Posts
-from memorylane.posts.forms import PostForm, PostEditForm
+from memorylane.models import Posts, Comments
+from memorylane.posts.forms import PostForm, PostEditForm, CommentForm
 from flask_login import current_user, login_required
 
 posts = Blueprint('posts', __name__)
@@ -12,10 +12,13 @@ posts = Blueprint('posts', __name__)
 @login_required
 def home():
     form = PostForm()
+    comment_form = CommentForm()
     page = int(request.args.get('page', 1))
     posts = Posts.query.order_by(Posts.date_posted.desc()).paginate(page=page, per_page=5, error_out=False)
+    comments = Comments.query.order_by(Comments.date_posted.asc())
 
-    return render_template('home.html', posts=posts, user=current_user, form=form)
+    return render_template('home.html', posts=posts, comments=comments,
+                           user=current_user, form=form, c_form=comment_form)
 
 
 @posts.route('/addpost', methods=["GET", "POST"])
@@ -32,6 +35,28 @@ def addpost():
         flash('Post added!', 'success')
         return redirect(url_for('posts.home'))
     return render_template('home.html', form=form)
+
+
+@posts.route('/comment/<int:post_id>', methods=["GET", "POST"])
+@login_required
+def add_comment(post_id):
+    commented_post = Posts.query.get(int(post_id))
+    c_form = CommentForm()
+
+    if c_form.validate_on_submit():
+        comment = Comments(
+            content=c_form.content.data,
+            user_id=current_user.id,
+            date_posted=datetime.now(),
+            com_post_id=commented_post.id)
+
+        db.session.add(comment)
+        db.session.commit()
+
+        flash('Comment added!', 'success')
+        return redirect(url_for('posts.home'))
+    return render_template('home.html', form=PostForm, c_form=c_form)
+
 
 
 @posts.route('/post/<int:post_id>')
@@ -67,9 +92,12 @@ def post_edit(post_id):
 @posts.route('/postdelete/<int:post_id>', methods=['POST'])
 def post_delete(post_id):
     post = Posts.query.get(post_id)
+    comments = Comments.query.filter_by(com_post_id=post_id).all()
 
     if post.author.id == current_user.id:
         db.session.delete(post)
+        for comment in comments:
+            db.session.delete(comment)
         db.session.commit()
 
         flash("Your post was deleted!", "success")

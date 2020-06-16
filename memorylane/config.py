@@ -9,3 +9,4 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('EMAIL_USER')  # TODO: Create ML e-mail acc and change env vars in os
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
+

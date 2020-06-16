@@ -78,3 +78,24 @@ a:hover {
     padding: 100px;
     background-color: #DDD;
 }
+
+.comments > p {
+    margin-top: 0;
+    margin-bottom: 0em;
+}
+
+.comments .card-footer {
+    padding: .0rem 0rem;
+}
+
+.comments .card {
+    margin-top: 10px;
+}
+
+.comments form textarea#content {
+     width: 100%;
+     border-radius: 4px;
+     border-color: white;
+     margin: 0px;
+     padding-bottom: 0px;
+}

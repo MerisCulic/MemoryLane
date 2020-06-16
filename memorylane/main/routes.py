@@ -10,4 +10,3 @@ def index():
         return redirect(url_for('users.profile', user=current_user))
     else:
         return render_template('index.html')
-
