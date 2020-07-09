@@ -17,3 +17,8 @@ class PostEditForm(FlaskForm):
 class CommentForm(FlaskForm):
     content = TextAreaField('Content', validators=[DataRequired()], render_kw={"placeholder": " Add a comment.."})
     submit = SubmitField('Comment')
+
+
+class CommentEditForm(FlaskForm):
+    content = TextAreaField('Content', validators=[DataRequired()], render_kw={'class': 'form-control', 'rows': 6})
+    submit = SubmitField('Update')

@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from memorylane import db
 from memorylane.models import Posts, Comments
-from memorylane.posts.forms import PostForm, PostEditForm, CommentForm
+from memorylane.posts.forms import PostForm, PostEditForm, CommentForm, CommentEditForm
 from flask_login import current_user, login_required
 
 posts = Blueprint('posts', __name__)
@@ -35,28 +35,6 @@ def addpost():
         flash('Post added!', 'success')
         return redirect(url_for('posts.home'))
     return render_template('home.html', form=form)
-
-
-@posts.route('/comment/<int:post_id>', methods=["GET", "POST"])
-@login_required
-def add_comment(post_id):
-    commented_post = Posts.query.get(int(post_id))
-    c_form = CommentForm()
-
-    if c_form.validate_on_submit():
-        comment = Comments(
-            content=c_form.content.data,
-            user_id=current_user.id,
-            date_posted=datetime.now(),
-            com_post_id=commented_post.id)
-
-        db.session.add(comment)
-        db.session.commit()
-
-        flash('Comment added!', 'success')
-        return redirect(url_for('posts.home'))
-    return render_template('home.html', form=PostForm, c_form=c_form)
-
 
 
 @posts.route('/post/<int:post_id>')
@@ -103,5 +81,60 @@ def post_delete(post_id):
         flash("Your post was deleted!", "success")
         return redirect(url_for('posts.home'))
 
+    else:
+        return redirect(url_for('main.index'))
+
+
+@posts.route('/comment/<int:post_id>', methods=["GET", "POST"])
+@login_required
+def add_comment(post_id):
+    commented_post = Posts.query.get(int(post_id))
+    c_form = CommentForm()
+
+    if c_form.validate_on_submit():
+        comment = Comments(
+            content=c_form.content.data,
+            user_id=current_user.id,
+            date_posted=datetime.now(),
+            com_post_id=commented_post.id)
+
+        db.session.add(comment)
+        db.session.commit()
+
+        flash('Comment added!', 'success')
+        return redirect(url_for('posts.home'))
+    return render_template('home.html', form=PostForm, c_form=c_form)
+
+
+@posts.route('/comment/<int:comment_id>/edit', methods=["GET", "POST"])
+@login_required
+def comment_edit(comment_id):
+    comment = Comments.query.get(int(comment_id))
+
+    if comment.com_author != current_user:
+        abort(403)
+    form = CommentEditForm()
+    if form.validate_on_submit():
+        comment.content = form.content.data
+        db.session.commit()
+
+        flash('Your comment has been updated!', 'success')
+        return redirect(url_for('posts.home'))
+
+    elif request.method == 'GET':
+        form.content.data = comment.content
+    return render_template('comment_edit.html', form=form, comment=comment)
+
+
+@posts.route('/comment/<int:comment_id>/delete', methods=['POST'])
+def comment_delete(comment_id):
+    comment = Comments.query.get(int(comment_id))
+
+    if comment.com_author == current_user:
+        db.session.delete(comment)
+        db.session.commit()
+
+        flash("Your comment has been deleted!", "success")
+        return redirect(url_for('posts.home'))
     else:
         return redirect(url_for('main.index'))

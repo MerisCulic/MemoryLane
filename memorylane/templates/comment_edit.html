@@ -1,22 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}Edit your post{% endblock title %}
+{% block title %}Edit your comment{% endblock title %}
 {% block content %}
     <div class="container shadow card social-timeline-card" style="padding-left: 0; padding-right: 0">
         <div class="card-header">
             <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" role="tab" >Edit your post</a>
+                    <a class="nav-link active" role="tab" >Edit your comment</a>
                 </li>
             </ul>
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ url_for('posts.post_edit', post_id=post.id) }}">
+            <form method="POST" action="{{ url_for('posts.comment_edit', comment_id=comment.id) }}">
             {{ form.csrf_token }}
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade active show" id="posts" role="tabpanel" aria-labelledby="posts-tab">
                         <div class="form-group">
-                          {{ form.title(class="form-control form-control-lg") }}<br>
                             {% if form.content.errors %}
                                 {{ form.content(class="form-control form-control-lg is-invalid") }}
                                 <div class="invalid-feedback">
