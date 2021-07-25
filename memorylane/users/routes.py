@@ -1,9 +1,10 @@
 import hashlib
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from memorylane import db
-from memorylane.models import User, Posts
+from memorylane.models import User, Posts, Comments
 from memorylane.users.forms import RegistrationForm, LoginForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm
-from memorylane.users.utils import save_picture, send_reset_email
+from memorylane.posts.forms import CommentForm
+from memorylane.users.utils import save_picture, save_cover, send_reset_email
 from flask_login import login_user, current_user, logout_user, login_required
 
 users = Blueprint('users', __name__)
@@ -19,7 +20,7 @@ def register():
         name = form.firstname.data + " " + form.surname.data
         hashed_password = hashlib.sha256(form.password.data.encode()).hexdigest()
         user = User(name=name, firstname=form.firstname.data, surname=form.surname.data,
-                    email=form.email.data, password=hashed_password)
+                    email=form.email.data, about=form.about.data, title=form.title.data, password=hashed_password)
 
         db.session.add(user)
         db.session.commit()
@@ -69,27 +70,45 @@ def logout():
 @login_required
 def profile():
     image_file = url_for('static', filename='img/profile_pics/' + current_user.image_file)
+    cover_photo = url_for('static', filename='img/cover_photos/' + current_user.cover_photo)
     page = int(request.args.get('page', 1))
+    comment_form = CommentForm()
     posts = Posts.query \
         .filter_by(author=current_user) \
         .order_by(Posts.date_posted.desc()) \
         .paginate(page=page, per_page=5, error_out=False)
+    comments = Comments.query.order_by(Comments.date_posted.asc())
 
-    return render_template("profile.html", user=current_user, image_file=image_file, posts=posts)
+    return render_template("profile.html",
+                           user=current_user,
+                           image_file=image_file,
+                           cover_photo=cover_photo,
+                           posts=posts,
+                           c_form=comment_form,
+                           comments=comments)
 
 
 @users.route('/profile/<user_id>', methods=["GET"])
 @login_required
 def user_profile(user_id):
     user = User.query.get(int(user_id))
+    image_file = url_for('static', filename='img/profile_pics/' + user.image_file)
+    cover_photo = url_for('static', filename='img/cover_photos/' + user.cover_photo)
     page = int(request.args.get('page', 1))
+    comment_form = CommentForm()
     posts = Posts.query\
         .filter_by(author=user)\
         .order_by(Posts.date_posted.desc())\
         .paginate(page=page, per_page=5, error_out=False)
+    comments = Comments.query.order_by(Comments.date_posted.asc())
 
-    image_file = url_for('static', filename='img/profile_pics/' + user.image_file)
-    return render_template("profile.html", posts=posts, user=user, image_file=image_file)
+    return render_template("profile.html",
+                           posts=posts,
+                           user=user,
+                           image_file=image_file,
+                           cover_photo=cover_photo,
+                           c_form=comment_form,
+                           comments=comments)
 
 
 @users.route('/update_profile', methods=["GET", "POST"])
@@ -101,9 +120,15 @@ def update_profile():
             picture_file = save_picture(form.picture.data)
             current_user.image_file = picture_file
 
+        if form.cover.data:
+            cover_photo = save_cover(form.cover.data)
+            current_user.cover_photo = cover_photo
+
         current_user.firstname = form.firstname.data
         current_user.surname = form.surname.data
         current_user.email = form.email.data
+        current_user.title = form.title.data
+        current_user.about = form.about.data
         current_user.name = form.firstname.data + " " + form.surname.data
 
         db.session.commit()
@@ -113,6 +138,8 @@ def update_profile():
     elif request.method == "GET":
         form.firstname.data = current_user.firstname
         form.surname.data = current_user.surname
+        form.about.data = current_user.about
+        form.title.data = current_user.title
         form.email.data = current_user.email
 
     return render_template("profile_edit.html", user=current_user, form=form)

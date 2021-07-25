@@ -3,6 +3,7 @@ body{
     background-size: cover;
     background-attachment: fixed;
     margin-top: 100px;
+    margin-bottom:50px;
 }
 
 .navbar{
@@ -98,4 +99,14 @@ a:hover {
      border-color: white;
      margin: 0px;
      padding-bottom: 0px;
+}
+
+.commentoptions {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
+
+.dropdown-toggle::after {
+    display: none;
 }

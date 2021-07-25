@@ -10,6 +10,8 @@ class RegistrationForm(FlaskForm):
     firstname = StringField('First name', validators=[DataRequired()])
     surname = StringField('Surname')
     email = StringField('Email', validators=[DataRequired(), Email()])
+    about = StringField('About')
+    title = StringField('Title')
     password = PasswordField('Password', validators=[DataRequired(), Length(min=5)])
     confirm_password = PasswordField('Confirm-password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign up')
@@ -18,6 +20,7 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError('That email address is already taken! Please enter a different one.')
+
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -30,7 +33,10 @@ class UpdateProfileForm(FlaskForm):
     firstname = StringField('First name', validators=[DataRequired()])
     surname = StringField('Surname')
     email = StringField('Email', validators=[DataRequired(), Email()])
-    picture = FileField('Update profile picture', validators=[FileAllowed(['png', 'jpg'])])
+    about = StringField('About')
+    title = StringField('Title')
+    picture = FileField('Update your profile picture', validators=[FileAllowed(['png', 'jpg', 'jpeg'])])
+    cover = FileField('Update your cover photo', validators=[FileAllowed(['png', 'jpg', 'jpeg'])])
     submit = SubmitField('Update')
 
     def validate_email(self, email):

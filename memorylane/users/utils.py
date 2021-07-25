@@ -5,6 +5,7 @@ from flask import current_app, url_for
 from memorylane import mail
 from flask_mail import Message
 
+
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
     f_name, f_ext = os.path.splitext(form_picture.filename)
@@ -14,10 +15,20 @@ def save_picture(form_picture):
     output_size = (250, 250)
     i = Image.open(form_picture)
     i.thumbnail(output_size)
-
     i.save(picture_path)
 
     return picture_fn
+
+
+def save_cover(form_picture):
+    random_hex = secrets.token_hex(8)
+    f_name, f_ext = os.path.splitext(form_picture.filename)
+    cover_fn = random_hex + f_ext
+    cover_path = os.path.join(current_app.root_path, 'static/img/cover_photos', cover_fn)
+    i = Image.open(form_picture)
+    i.save(cover_path)
+
+    return cover_fn
 
 
 def send_reset_email(user):
@@ -31,4 +42,5 @@ If you did not make this request then simply ignore this email and no changes wi
 '''
     mail.send(msg)
 
-
+#TODO Set up a ML email account from which reset mails can be sent
+#For this to work less secure app approval must be enabled in the e-mail account

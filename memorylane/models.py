@@ -16,10 +16,12 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String)
     email = db.Column(db.String, unique=True)
     password = db.Column(db.String)
+    about = db.Column(db.String, default="")
+    title = db.Column(db.String, default="")
     image_file = db.Column(db.String(20), default='default_avatar.jpg')
+    cover_photo = db.Column(db.String, default='default_cover.jpeg')
     posts = db.relationship('Posts', backref='author', lazy=True)
     comments = db.relationship('Comments', backref='com_author', lazy=True)
-
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)

@@ -4,6 +4,18 @@ body {
 
 }
 /*social */
+.cover {
+    background-color: #cccccc;
+    background-size: initial;
+    background-repeat: no-repeat;
+    height: auto;
+    max-height: 500px;
+    width: 100%;
+    border-radius: 5px 5px 0 0;
+    margin-bottom: -10px;
+}
+
+
 .card-one {
     position: relative;
     width: 300px;
@@ -14,14 +26,6 @@ body {
     margin-top: 35px;
     box-shadow: 0 10px 20px 0 rgba(26, 44, 57, 0.14);
     border: none;
-}
-
-.follower-wrapper li {
-    list-style-type: none;
-    color: #fff;
-    display: inline-block;
-    float: left;
-    margin-right: 20px;
 }
 
 .social-profile {
@@ -39,6 +43,7 @@ body {
 
 .social-profile .user-profile {
     position: absolute;
+    object-fit: scale-down;
     bottom: -75px;
     width: 150px;
     height: 150px;
@@ -68,6 +73,7 @@ body {
     border-radius: 50%;
     margin-bottom: 20px;
     border: 5px solid #fff;
+    object-fit: cover;
 }
 
 .social-prof h3 {
@@ -111,45 +117,6 @@ body {
 
 .text-blue {
     color: #3afe;
-}
-
-ul.friend-list {
-    margin: 0;
-    padding: 0;
-}
-
-ul.friend-list li {
-    list-style-type: none;
-    display: flex;
-    align-items: center;
-}
-
-ul.friend-list li:hover {
-    background: rgba(0, 0, 0, .1);
-    cursor: pointer;
-}
-
-ul.friend-list .left img {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    margin-right: 20px;
-}
-
-ul.friend-list li {
-    padding: 10px;
-}
-
-ul.friend-list .right h3 {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 0;
-}
-
-ul.friend-list .right p {
-    font-size: 11px;
-    color: #6c757d;
-    margin: 0;
 }
 
 .social-timeline-card .dropdown-toggle::after {
