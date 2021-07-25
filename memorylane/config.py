@@ -2,7 +2,7 @@ import os
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DB_URI')  # TODO: Change localhost to heroku
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DB_URI', "sqlite:///db.sqlite").replace("postgres://", "postgresql://", 1)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAIL_SERVER = 'smtp.googlemail.com'  # TODO: Change mail server value if ML acc not on gmail
     MAIL_PORT = 587
