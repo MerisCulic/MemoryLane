@@ -1,4 +1,4 @@
-from memorylane.models import User
+from bookbits.models import User
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField

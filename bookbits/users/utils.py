@@ -2,7 +2,7 @@ import os
 import secrets
 from PIL import Image
 from flask import current_app, url_for
-from memorylane import mail
+from bookbits import mail
 from flask_mail import Message
 
 

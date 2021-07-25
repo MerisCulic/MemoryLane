@@ -1,10 +1,10 @@
 import hashlib
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from memorylane import db
-from memorylane.models import User, Posts, Comments
-from memorylane.users.forms import RegistrationForm, LoginForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm
-from memorylane.posts.forms import CommentForm
-from memorylane.users.utils import save_picture, save_cover, send_reset_email
+from bookbits import db
+from bookbits.models import User, Posts, Comments
+from bookbits.users.forms import RegistrationForm, LoginForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm
+from bookbits.posts.forms import CommentForm
+from bookbits.users.utils import save_picture, save_cover, send_reset_email
 from flask_login import login_user, current_user, logout_user, login_required
 
 users = Blueprint('users', __name__)
@@ -27,7 +27,7 @@ def register():
 
         login_user(user)
 
-        flash('Welcome to Memory Lane {}! '
+        flash('Welcome to Book Bits {}! '
               'Your account has been successfully created!'.format(form.firstname.data), 'success')
         return redirect(url_for('users.profile', user=current_user))
     return render_template("registration.html", form=form)

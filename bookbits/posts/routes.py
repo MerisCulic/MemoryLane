@@ -1,8 +1,8 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
-from memorylane import db
-from memorylane.models import Posts, Comments
-from memorylane.posts.forms import PostForm, PostEditForm, CommentForm, CommentEditForm
+from bookbits import db
+from bookbits.models import Posts, Comments
+from bookbits.posts.forms import PostForm, PostEditForm, CommentForm, CommentEditForm
 from flask_login import current_user, login_required
 
 posts = Blueprint('posts', __name__)

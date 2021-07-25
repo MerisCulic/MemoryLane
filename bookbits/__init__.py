@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
-from memorylane.config import Config
+from bookbits.config import Config
 
 
 mail = Mail()
@@ -21,11 +21,11 @@ def create_app():
     mail.init_app(app)
     login_manager.init_app(app)
 
-    from memorylane.users.routes import users
-    from memorylane.posts.routes import posts
-    from memorylane.messages.routes import messages
-    from memorylane.main.routes import main
-    from memorylane.errors.handlers import errors
+    from bookbits.users.routes import users
+    from bookbits.posts.routes import posts
+    from bookbits.messages.routes import messages
+    from bookbits.main.routes import main
+    from bookbits.errors.handlers import errors
 
     app.register_blueprint(users)
     app.register_blueprint(posts)

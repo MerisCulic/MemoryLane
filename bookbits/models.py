@@ -1,4 +1,4 @@
-from memorylane import db, login_manager
+from bookbits import db, login_manager
 from flask import current_app
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -19,7 +19,7 @@ class User(db.Model, UserMixin):
     about = db.Column(db.String, default="")
     title = db.Column(db.String, default="")
     image_file = db.Column(db.String(20), default='default_avatar.jpg')
-    cover_photo = db.Column(db.String, default='default_cover.jpeg')
+    cover_photo = db.Column(db.String, default='default_cover.jpg')
     posts = db.relationship('Posts', backref='author', lazy=True)
     comments = db.relationship('Comments', backref='com_author', lazy=True)
 

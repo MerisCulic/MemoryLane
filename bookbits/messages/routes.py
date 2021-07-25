@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from memorylane import db
-from memorylane.models import Messages
+from bookbits import db
+from bookbits.models import Messages
 from flask_login import current_user, login_required
 
 messages = Blueprint('messages', __name__)
