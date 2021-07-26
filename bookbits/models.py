@@ -39,6 +39,7 @@ class User(db.Model, UserMixin):
 
 
 class Messages(db.Model):
+    __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
     sender_email = db.Column(db.String)
     sender_name = db.Column(db.String)
