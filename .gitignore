@@ -1,7 +1,8 @@
 venv/
 .idea/
 __pycache__/
-
+profile_pics
+cover_photos
 *.sqlite
 *.pyc
 db.json
