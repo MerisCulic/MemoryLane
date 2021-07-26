@@ -1,4 +1,5 @@
 from bookbits import db, login_manager
+from datetime import datetime
 from flask import current_app
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -43,7 +44,7 @@ class Messages(db.Model):
     sender_name = db.Column(db.String)
     reciever = db.Column(db.String)
     title = db.Column(db.String)
-    date_posted = db.Column(db.DateTime)
+    date_posted = db.Column(db.DateTime, default=datetime.now())
     message_text = db.Column(db.Text)
 
 
@@ -51,7 +52,7 @@ class Posts(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50))
-    date_posted = db.Column(db.DateTime)
+    date_posted = db.Column(db.DateTime, default=datetime.now())
     content = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
@@ -60,7 +61,7 @@ class Comments(db.Model):
     __tablename__ = 'comments'
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text)
-    date_posted = db.Column(db.DateTime)
+    date_posted = db.Column(db.DateTime, default=datetime.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     com_post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
 
