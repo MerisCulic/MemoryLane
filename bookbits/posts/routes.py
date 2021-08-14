@@ -9,7 +9,6 @@ posts = Blueprint('posts', __name__)
 
 
 @posts.route('/home', methods=['GET'])
-@login_required
 def home():
     form = PostForm()
     comment_form = CommentForm()

@@ -22,25 +22,31 @@
     {% endblock head %}
   </head>
   <body>
-  {% if current_user.is_authenticated %}
-    {% block navbar %}
+
+  {% block navbar %}
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark shadow">
       <a class="navbar-brand" href="/home">Book bits</a>
+
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
               aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
+          {% if current_user.is_authenticated %}
           <a class="nav-item nav-link active" href="/profile">Profile <span class="sr-only">(current)</span></a>
           <a class="nav-item nav-link active" href="/inbox">Messages</a>
           <a class="nav-item nav-link active" href="/users">Users</a>
           <a class="nav-item nav-link active" href="/logout">Logout</a>
+          {% else %}
+          <a class="nav-item nav-link active" href="/login">Login</a>
+          <a class="nav-item nav-link active" href="/register">Register</a>
+          {% endif %}
         </div>
       </div>
     </nav>
-    {% endblock navbar %}
-  {% endif %}
+  {% endblock navbar %}
+
 
     <!--flash messages-->
     <div class="container">

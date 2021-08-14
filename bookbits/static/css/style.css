@@ -1,14 +1,11 @@
 body{
-    background: url("/static/img/home.jpg")no-repeat;
-    background-size: cover;
-    background-attachment: fixed;
+    background-color: rgb(237, 245, 225);
     margin-top: 100px;
     margin-bottom:50px;
 }
 
 .navbar{
-    background: rgb(244,244,246);
-    background: linear-gradient(180deg, rgba(244,244,246,1) 0%, rgba(164,175,163,0.6166841736694677) 45%);
+    background: #379683;
 }
 
 .flash-msg {
@@ -42,19 +39,6 @@ a:hover {
     text-decoration: none;
     color: gray;
 }
-
-.sidemenu a {
-    text-decoration: none;
-    color: white;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.sidemenu a:hover {
-    text-shadow: 3px 6px 4px rgba(7,4,4,0.38);
-}
-
-
 
 .blur{
     filter: blur(8px);

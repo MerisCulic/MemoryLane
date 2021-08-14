@@ -24,8 +24,6 @@
             <div class="col-lg-3">
                 <div class="card">
                     <div class="card-body">
-                        <div class="h5 text-blue">{{ user.name }}</div>
-                        <div class="h7"><strong>Email :</strong> {{ user.email }}</div>
                         <div class="h7"><strong>About :</strong> {{ user.about }}
                         </div>
                         <div><br>
@@ -91,8 +89,15 @@
                                 <p style="white-space: pre-wrap">{{ post.content|safe }}</p>
                             </div>
                             <div class="card-footer">
-                                <a class="btn btn-outline-info" data-toggle="collapse" href="#postnumber_{{ post.id }}" role="button" aria-expanded="false" aria-controls="collapseComments">
-                                <i class="fas fa-comment"></i>
+                                <a class="btn btn-outline-info position-relative" data-toggle="collapse" href="#postnumber_{{ post.id }}" role="button" aria-expanded="false" aria-controls="collapseComments">
+                                    <i class="fas fa-comment"></i>
+                                    {% set cc = namespace(count=0) %}
+                                    {% for comment in comments if comment.com_post_id == post.id %}
+                                        {% set cc.count = cc.count + 1 %}
+                                    {% endfor %}
+                                    {% if cc.count > 0 %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ cc.count }}</span>
+                                    {% endif %}
                                 </a>
                             </div>
                         </div>
@@ -149,6 +154,7 @@
 
                                     {% endif %}
                                 {% endfor %}
+                                {% if user.isAuthenticated %}
                                 <!-- Add comment -->
                                 <div class="card">
                                     <form method="POST" action="{{ url_for('posts.add_comment', post_id=post.id) }}" class="form-inline">
@@ -170,6 +176,7 @@
                                         </div>
                                     </form>
                                 </div>
+                                {% endif %}
                             </div>
                         </div>
 

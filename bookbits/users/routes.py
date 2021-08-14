@@ -89,7 +89,6 @@ def profile():
 
 
 @users.route('/profile/<user_id>', methods=["GET"])
-@login_required
 def user_profile(user_id):
     user = User.query.get(int(user_id))
     image_file = url_for('static', filename='img/profile_pics/' + user.image_file)
