@@ -1,8 +1,9 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from bookbits import db
-from bookbits.models import Posts, Comments
+from bookbits.models import Posts, Comments, User
 from bookbits.posts.forms import PostForm, PostEditForm, CommentForm, CommentEditForm
+from bookbits.users.utils import load_image
 from flask_login import current_user, login_required
 
 posts = Blueprint('posts', __name__)
@@ -15,6 +16,15 @@ def home():
     page = int(request.args.get('page', 1))
     posts = Posts.query.order_by(Posts.date_posted.desc()).paginate(page=page, per_page=5, error_out=False)
     comments = Comments.query.order_by(Comments.date_posted.asc())
+    # Load profile pictures of post and comment authors
+    p = Posts.query.all()
+    for a in p:
+        user = User.query.get(int(a.user_id))
+        load_image(user, 'profile')
+    c = Comments.query.all()
+    for a in c:
+        user = User.query.get(int(a.user_id))
+        load_image(user, 'profile')
 
     return render_template('home.html', posts=posts, comments=comments,
                            user=current_user, form=form, c_form=comment_form)

@@ -4,7 +4,7 @@ from bookbits import db
 from bookbits.models import User, Posts, Comments
 from bookbits.users.forms import RegistrationForm, LoginForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm
 from bookbits.posts.forms import CommentForm
-from bookbits.users.utils import save_picture, save_cover, send_reset_email
+from bookbits.users.utils import upload_image, send_reset_email, load_image
 from flask_login import login_user, current_user, logout_user, login_required
 
 users = Blueprint('users', __name__)
@@ -69,8 +69,8 @@ def logout():
 @users.route('/profile', methods=["GET"])
 @login_required
 def profile():
-    image_file = url_for('static', filename='img/profile_pics/' + current_user.image_file)
-    cover_photo = url_for('static', filename='img/cover_photos/' + current_user.cover_photo)
+    image_file = load_image(current_user, 'profile')
+    cover_photo = load_image(current_user, 'cover')
     page = int(request.args.get('page', 1))
     comment_form = CommentForm()
     posts = Posts.query \
@@ -91,8 +91,8 @@ def profile():
 @users.route('/profile/<user_id>', methods=["GET"])
 def user_profile(user_id):
     user = User.query.get(int(user_id))
-    image_file = url_for('static', filename='img/profile_pics/' + user.image_file)
-    cover_photo = url_for('static', filename='img/cover_photos/' + user.cover_photo)
+    image_file = load_image(user, 'profile')
+    cover_photo = load_image(user, 'cover')
     page = int(request.args.get('page', 1))
     comment_form = CommentForm()
     posts = Posts.query\
@@ -116,11 +116,11 @@ def update_profile():
     form = UpdateProfileForm()
     if form.validate_on_submit():
         if form.picture.data:
-            picture_file = save_picture(form.picture.data)
+            picture_file = upload_image(current_user, form.picture.data, 'profile')
             current_user.image_file = picture_file
 
         if form.cover.data:
-            cover_photo = save_cover(form.cover.data)
+            cover_photo = upload_image(current_user, form.cover.data, 'cover')
             current_user.cover_photo = cover_photo
 
         current_user.firstname = form.firstname.data
@@ -148,6 +148,8 @@ def update_profile():
 @login_required
 def reg_users():
     reg_users = User.query.all()
+    for user in reg_users:
+        load_image(user, 'profile')
     return render_template('users.html', users=reg_users)
 
 

@@ -108,7 +108,7 @@
                                     {% if comment.com_post_id == post.id %}
                                         <div class="card flex-row flex-wrap">
                                             <div class="card-header border-0">
-                                                <img class="img-fluid rounded-circle" width="60" src="static/img/profile_pics/{{ comment.com_author.image_file }}">
+                                                <img class="img-fluid rounded-circle" width="60" src="{{ url_for('static', filename ='img/profile_pics/' + comment.com_author.image_file) }}">
                                             </div>
                                             <div class="card-block p-2 px-3">
                                                 <h6><a href="{{ url_for('users.user_profile', user_id=comment.com_author.id) }}">{{ comment.com_author.name }}</a></h6>
