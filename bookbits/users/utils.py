@@ -27,7 +27,7 @@ def upload_image(user, form_picture, image):
     if image == 'profile':
         file_path = os.path.join(current_app.root_path, 'static/img/profile_pics/', filename)
         upload_path = os.path.join('img/profile_pics/', filename)
-        image_size = (250, 250)
+        image_size = (400, 400)
         previous_picture = user.image_file
         s3_delete_path = os.path.join('img/profile_pics/', previous_picture)
     else:
@@ -70,7 +70,6 @@ def load_image(user, image):
         s3.Bucket(Config.AWS_STORAGE_BUCKET_NAME).download_file(aws_path, save_path)
         image = url_for('static', filename=path + user_image)
     except s3.meta.client.exceptions.ClientError:
-        print("The object does not exist.")
         default_path = os.path.join(path, default_image)
         image = url_for('static', filename=default_path)
 
