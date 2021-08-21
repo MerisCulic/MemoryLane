@@ -1,11 +1,12 @@
 import os
 import secrets
 from PIL import Image
-from flask import current_app, url_for
+from flask import current_app, url_for, request
 from bookbits import mail
 from flask_mail import Message
 from bookbits.config import Config
 import boto3
+import botocore
 
 
 # Connect to AWS S3 file storage
@@ -57,14 +58,21 @@ def load_image(user, image):
     if image == 'profile':
         path = 'img/profile_pics/'
         user_image = user.image_file
+        default_image = 'default_avatar.jpg'
     else:
         path = 'img/cover_photos/'
         user_image = user.cover_photo
+        default_image = 'default_cover.jpg'
 
-    aws_path = os.path.join(path, user_image)
-    save_path = os.path.join(current_app.root_path, 'static/', path, user_image)
-    s3.Bucket(Config.AWS_STORAGE_BUCKET_NAME).download_file(aws_path, save_path)
-    image = url_for('static', filename=path + user_image)
+    try:
+        aws_path = os.path.join(path, user_image)
+        save_path = os.path.join(current_app.root_path, 'static/', path, user_image)
+        s3.Bucket(Config.AWS_STORAGE_BUCKET_NAME).download_file(aws_path, save_path)
+        image = url_for('static', filename=path + user_image)
+    except s3.meta.client.exceptions.ClientError:
+        print("The object does not exist.")
+        default_path = os.path.join(path, default_image)
+        image = url_for('static', filename=default_path)
 
     return image
 
