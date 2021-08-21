@@ -54,11 +54,7 @@
                             <div class="card-header">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <div class="mr-2">
-                                            <a href="{{ url_for('users.user_profile', user_id=post.author.id) }}">
-                                                <img class="rounded-circle" width="70" src="static/img/profile_pics/{{ post.author.image_file }}" alt="">
-                                            </a>
-                                        </div>
+                                        
                                         <div class="ml-2">
                                             <div class="h5 m-0"><a href="{{ url_for('users.user_profile', user_id=post.author.id) }}"> {{ post.author.name }}</a></div>
                                             <div class="text-muted h7 mb-0"><i>{{ post.date_posted.strftime('%B %d, %Y') }}</i></div>
@@ -108,7 +104,7 @@
                                     {% if comment.com_post_id == post.id %}
                                         <div class="card flex-row flex-wrap">
                                             <div class="card-header border-0">
-                                                <img class="img-fluid rounded-circle" width="60" src="{{ url_for('static', filename ='img/profile_pics/' + comment.com_author.image_file) }}">
+                                                <img class="user-profile-comments" width="60" src="{{ url_for('static', filename ='img/profile_pics/' + comment.com_author.image_file) }}">
                                             </div>
                                             <div class="card-block p-2 px-3">
                                                 <h6><a href="{{ url_for('users.user_profile', user_id=comment.com_author.id) }}">{{ comment.com_author.name }}</a></h6>
